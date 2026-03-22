@@ -1,20 +1,28 @@
-# Blaze-Fire-Hub
-Uygulama indirmek, kod yazmak veya bilgisayarınızı hızlandırmak için onlarca farklı pencere arasında kaybolmanıza gerek yok. Blaze Fire Hub, tüm bu süreçleri şık ve hızlı bir arayüzde birleştiriyor.  🔥 Hızlı Mağaza | 🤖 Yapay Zeka | 💻 Kod Yardımı | 🛠️ Sistem Optimizasyonu  Hemen deneyin ve verimliliğinizi zirveye taşıyın!
+No more getting lost between dozens of windows just to download apps, write code, or optimize your computer. Blaze Fire Hub brings all these processes together in a sleek and fast interface.
+🔥 Fast Store | 🤖 AI | 💻 Coding Assistance | 🛠️ System Optimization
+Try it now and take your productivity to the next level!
 
-FireHub uygulaması bazı antivirüs yazılımları tarafından yanlış pozitif (false positive) olarak işaretlenebilir. Bunun başlıca nedenleri şunlardır:
+The FireHub application may be flagged as a false positive by some antivirus software. The main reasons for this are:
 
-Neden Uyarı Alıyor Olabilirsiniz?
-Paketleme Mimarisi: Uygulama Python tabanlıdır ve kullanım kolaylığı için PyInstaller ile tek bir .exe dosyası haline getirilmiştir. Bu paketleme yöntemi, bazı sezgisel tarama motorları tarafından (dosya yapısı nedeniyle) şüpheli olarak sınıflandırılabilmektedir.
+Why You May Be Receiving Warnings
 
-Dijital İmza Durumu: Proje şu an geliştirme/test aşamasındadır. Yıllık yüksek maliyetli sertifika gerektiren "Dijital İmza" henüz eklenmediği için Windows SmartScreen veya bazı antivirüsler "Bilinmeyen Yayımcı" uyarısı gösterebilir.
+Packaging Architecture:
+The application is Python-based and has been bundled into a single .exe file using PyInstaller for ease of use. This packaging method may be classified as suspicious by some heuristic scanning engines due to its file structure.
 
-Sistem Etkileşimi: Uygulama içi mağazadan dosya indirme ve BlazeOS üzerinden sistem optimizasyonu yapma yetenekleri, güvenlik yazılımları tarafından "yüksek yetkili işlem" olarak algılanabilir.
+Digital Signature Status:
+The project is currently in the development/testing phase. Since a "Digital Signature" (which requires a costly annual certificate) has not yet been added, Windows SmartScreen or some antivirus programs may display an "Unknown Publisher" warning.
 
-Eğer uygulama hakkında şüphe duyuyorsanız:
+System Interaction:
+Features such as downloading files from the in-app store and performing system optimization via BlazeOS may be perceived as "high-privilege operations" by security software.
 
-Dosyayı antivirüs yazılımınız ile tarayabilirsiniz
-Sanal makine ortamında test edebilirsiniz
-Ağ trafiğini ve sistem kullanımını görev yöneticisi veya benzeri araçlarla inceleyebilirsiniz
+If You Have Concerns About the Application:
 
-Veri Gizliliği Sözümüz
-FireHub, yalnızca kullanıcı bir işlem başlattığında (AI ile sohbet veya uygulama indirme gibi) internete bağlanır. Arka planda izinsiz veri toplama, gönderme veya kripto madenciliği gibi gizli faaliyetler kesinlikle bulunmamaktadır.
+You can scan the file with your antivirus software
+You can test it in a virtual machine environment
+You can monitor network traffic and system usage via Task Manager or similar tools
+
+Our Commitment to Data Privacy
+FireHub only connects to the internet when the user initiates an action (such as chatting with AI or downloading an app). There are absolutely no hidden activities such as unauthorized data collection, transmission, or crypto mining in the background.
+
+Note:
+The application is still in the testing phase, so bugs or performance issues may occur.
