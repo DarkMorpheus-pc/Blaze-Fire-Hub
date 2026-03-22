@@ -1,0 +1,2 @@
+FireHub.exe uygulamasına sağ tık yapıp kısayol oluştur seçeneği ile masaüstünüze kısayolu ekleyebilirsiniz.
+İkonu ayarlamak için oluşturduğunuz kısayola sağ tıklayıp özellikler seçeneğine basınca açılan pencerede simge değiştir butonuna basın ardından gözat seçeneğinden indirdiğiniz FireHub klasörünün içinde bulunan Dosyalar klasörü ve Dosyalar klasörünün içinde bulunan İCON klasörün klasöründeki FireHubİCON.ico dosyasını seçip ardından uygula diyerek oluşturduğunuz kısayolun ikonunu ayarlayabilirsiniz.

@@ -1,0 +1,17 @@
+FireHub uygulaması bazı antivirüs yazılımları tarafından yanlış pozitif (false positive) olarak işaretlenebilir. Bunun başlıca nedenleri şunlardır:
+
+Neden Uyarı Alıyor Olabilirsiniz?
+Paketleme Mimarisi: Uygulama Python tabanlıdır ve kullanım kolaylığı için PyInstaller ile tek bir .exe dosyası haline getirilmiştir. Bu paketleme yöntemi, bazı sezgisel tarama motorları tarafından (dosya yapısı nedeniyle) şüpheli olarak sınıflandırılabilmektedir.
+
+Dijital İmza Durumu: Proje şu an geliştirme/test aşamasındadır. Yıllık yüksek maliyetli sertifika gerektiren "Dijital İmza" henüz eklenmediği için Windows SmartScreen veya bazı antivirüsler "Bilinmeyen Yayımcı" uyarısı gösterebilir.
+
+Sistem Etkileşimi: Uygulama içi mağazadan dosya indirme ve BlazeOS üzerinden sistem optimizasyonu yapma yetenekleri, güvenlik yazılımları tarafından "yüksek yetkili işlem" olarak algılanabilir.
+
+Eğer uygulama hakkında şüphe duyuyorsanız:
+
+Dosyayı antivirüs yazılımınız ile tarayabilirsiniz
+Sanal makine ortamında test edebilirsiniz
+Ağ trafiğini ve sistem kullanımını görev yöneticisi veya benzeri araçlarla inceleyebilirsiniz
+
+Veri Gizliliği Sözümüz
+FireHub, yalnızca kullanıcı bir işlem başlattığında (AI ile sohbet veya uygulama indirme gibi) internete bağlanır. Arka planda izinsiz veri toplama, gönderme veya kripto madenciliği gibi gizli faaliyetler kesinlikle bulunmamaktadır.
