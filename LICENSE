@@ -1,10 +1,87 @@
-Copyright (c) 2026 DarkMorpheus (Bulut Ars.E.) All rights reserved.
+FireHub — Özel Yazılım Lisansı / Proprietary Software License
+Copyright (c) 2026 DarkMorpheus (Bulut Ars.E.). Tüm hakları saklıdır. / All rights reserved.
 
-This software and all associated files are proprietary and confidential.
-Unauthorized copying, modification, distribution, or use of this software,
-via any medium, is strictly prohibited.
+================================================================================
+TÜRKÇE (Asıl / Bağlayıcı Metin)
+================================================================================
 
-For inquiries regarding usage permissions, please contact the author.
+Bu yazılım ("FireHub") ve onu oluşturan kaynak kod, derlenmiş paketler ve tüm
+ilgili dosyalar DarkMorpheus (Bulut Ars.E.) telif hakkı altındadır. Tüm hakları
+saklıdır.
 
-## ⚖️ License
-Copyright © 2026 DarkMorpheus All rights reserved. This project is proprietary.
+1. İZİN VERİLENLER
+   - Yazılımı kişisel kullanım amacıyla indirebilir, kurabilir ve çalıştırabilirsiniz.
+   - Yazılımın paket içeriğini (kaynak kodu dahil) yalnızca kişisel inceleme,
+     öğrenme ve değerlendirme amacıyla görüntüleyebilirsiniz.
+
+2. YASAKLAR
+   Aşağıdakiler, telif hakkı sahibinin önceden yazılı izni olmadan KESİNLİKLE
+   YASAKTIR:
+   a) Kaynak kodun tamamını veya bir kısmını kopyalamak, çoğaltmak veya başka
+      bir projeye, ürüne ya da yazılıma dahil etmek;
+   b) Yazılımı veya kodunu değiştirmek, uyarlamak, türev çalışma üretmek;
+   c) Yazılımı veya kodunu yeniden dağıtmak, yayınlamak, satmak, kiralamak veya
+      başka birine devretmek;
+   d) Yazılımı veya kodunu bir başka işletim sistemi, dağıtım veya ürünün parçası
+      olarak kullanmak;
+   e) Telif hakkı, lisans veya marka bildirimlerini kaldırmak ya da değiştirmek.
+
+   Bu yasaklar, ticari olsun olmasın her türlü kullanım için geçerlidir.
+
+3. LİSANS TALEBİ
+   Yukarıda yasaklanan kullanımlardan herhangi birini yapmak istiyorsanız,
+   telif hakkı sahibinden yazılı izin almanız gerekir:
+   https://blazeos.com.tr/
+
+4. GARANTİ REDDİ
+   Bu yazılım "OLDUĞU GİBİ" sağlanır; açık veya örtülü hiçbir garanti verilmez.
+   Telif hakkı sahibi, yazılımın kullanımından doğabilecek hiçbir zarardan
+   sorumlu tutulamaz.
+
+5. UYGULANACAK HUKUK
+   Bu lisans Türkiye Cumhuriyeti yasalarına tabidir. İhlal durumunda telif hakkı
+   sahibi yasal yollara başvurma hakkını saklı tutar.
+
+================================================================================
+ENGLISH (Translation for Reference)
+================================================================================
+
+This software ("FireHub"), including its source code, compiled packages, and all
+related files, is copyrighted by DarkMorpheus (Bulut Ars.E.). All rights reserved.
+
+1. PERMITTED
+   - You may download, install, and run the software for personal use.
+   - You may view the contents of the package (including source code) solely for
+     personal study, learning, and evaluation purposes.
+
+2. PROHIBITED
+   The following are STRICTLY PROHIBITED without the prior written permission of
+   the copyright holder:
+   a) Copying, reproducing, or incorporating the source code, in whole or in part,
+      into any other project, product, or software;
+   b) Modifying, adapting, or creating derivative works of the software or its code;
+   c) Redistributing, publishing, selling, renting, or transferring the software or
+      its code to any third party;
+   d) Using the software or its code as part of another operating system,
+      distribution, or product;
+   e) Removing or altering any copyright, license, or trademark notices.
+
+   These prohibitions apply to all uses, whether commercial or non-commercial.
+
+3. LICENSING REQUESTS
+   If you wish to engage in any of the prohibited uses above, you must obtain
+   written permission from the copyright holder: https://blazeos.com.tr/
+
+4. DISCLAIMER OF WARRANTY
+   This software is provided "AS IS", without warranty of any kind, express or
+   implied. The copyright holder shall not be liable for any damages arising from
+   the use of this software.
+
+5. GOVERNING LAW
+   This license is governed by the laws of the Republic of Türkiye. The copyright
+   holder reserves the right to pursue legal remedies in case of violation.
+
+--------------------------------------------------------------------------------
+Bir uyuşmazlık durumunda Türkçe metin esas alınır. / In case of any conflict,
+the Turkish text shall prevail.
+--------------------------------------------------------------------------------
