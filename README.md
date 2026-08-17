@@ -5,6 +5,8 @@
 FireHub, Linux masaüstünde uygulama keşfetmeyi, kurmayı ve yönetmeyi tek bir yerden, modern ve akıcı bir arayüzle yapmanı sağlayan bir Electron uygulamasıdır. BlazeOS için optimize edilmiştir, ancak `.deb`, `.rpm` ve `.pisi` paketleri sayesinde Debian/Ubuntu, Fedora/RHEL ve Pisi Linux tabanlı dağıtımlarda da çalışır.
 
 > Sürüm 1.8.0 — "Pisi Update"
+<img width="1187" height="757" alt="image" src="https://github.com/user-attachments/assets/efd855eb-1d6c-4e0a-9cab-2286a2211e0e" />
+
 
 ---
 
@@ -19,15 +21,23 @@ Her uygulama kartında ekran görüntüleri, sürüm bilgisi, geliştirici, pake
 
 ### 🎨 Material 3 Expressive tasarım
 6 farklı tema rengi (Coral, Purple, Forest, Ocean, Sunset, Mint) + karanlık mod, dinamik "island" bildirimleri, akıcı geçiş animasyonları ve duyarlı (responsive) bir arayüz.
+<img width="397" height="666" alt="image" src="https://github.com/user-attachments/assets/5fa6471b-2dbd-4be9-a839-94310b42efd0" />
+
 
 ### ⭐ Gerçek zamanlı değerlendirmeler
 Firebase Authentication (e-posta/şifre + Google girişi) ile hesap oluşturup uygulamalara puan verebilir, yorum yazabilirsin. Yorumlar Firestore üzerinden gerçek zamanlı senkronize edilir; alan bazlı doğrulama ve ban sistemiyle kötüye kullanım engellenir.
+<img width="344" height="477" alt="image" src="https://github.com/user-attachments/assets/a8f62743-7d7a-423d-ba89-3691e664e300" />
+
 
 ### 🌍 5 dil desteği
 Türkçe, İngilizce, Rusça, Japonca ve Çince — arayüz dili anında (sayfa yenilenmeden) değiştirilebilir.
+<img width="474" height="763" alt="image" src="https://github.com/user-attachments/assets/a445c23e-b133-4051-abf5-94c19620cf50" />
+
 
 ### 📥 Çoklu platform kurulumu
 Tek bir "Kur" düğmesiyle işletim sistemine uygun paket otomatik seçilir:
+<img width="1920" height="1025" alt="image" src="https://github.com/user-attachments/assets/b223fb94-7a44-421a-a415-d0117add1129" />
+
 
 | Platform | Format | Yöntem |
 |---|---|---|
