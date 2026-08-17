@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+
+<!--
+  FireHub — BlazeOS icin DarkMorpheus (Bulut Ars. E.) tarafindan gelistirilmistir.
+  blazeos.com.tr - https://github.com/DarkMorpheus-pc
+  (c) Bulut Arslan Ergun — Bu program ozgur yazilimdir: GNU GPL v3.0 kosullari altinda yeniden dagitabilir ve/veya degistirebilirsiniz. Hicbir garanti verilmez; ayrintilar icin LICENSE dosyasina bakin.
+-->
+
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' data: https://cdn.jsdelivr.net https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com; script-src 'self' https://apis.google.com; frame-src https://blaze-firehub.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self';" />
+  <title>FireHub</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Display:wght@400;500;700&family=Google+Sans+Text:wght@400;500&display=swap">
+</head>
+<body>
+  <div id="app">
+<h2 class="sr-only">FireHub Material 3 Expressive uygulama mağazası</h2>
+
+<div class="fh t-coral" id="fh">
+  <!-- BlazeOS banner — en üstte ince çubuk -->
+  <div class="fh-blaze-banner" id="blazeBanner">
+    <i class="ti ti-flame"></i>
+    <span data-i18n="banner.blazeos">Optimized for BlazeOS — upgrade to BlazeOS for the best experience</span>
+  </div>
+
+  <!-- Dynamic island -->
+  <div class="fh-island" id="isl">
+    <div class="fh-i-check"><i class="ti ti-check"></i></div>
+    <div style="flex:1;min-width:0;">
+      <div class="fh-i-t" id="islT">Notification</div>
+      <div class="fh-i-s" id="islS">Subtitle</div>
+    </div>
+  </div>
+
+  <!-- Arka planda devam eden kurulum(lar) için kalıcı gösterge — hangi
+       sayfada olursa olsun görünür kalır, tıklayınca o uygulamanın detay
+       sayfasını açar. Kullanıcı bir uygulamayı kurarken başka bir sayfaya
+       geçse bile kurulumun hâlâ sürdüğünü gösterir. -->
+  <div class="fh-install-island" id="instIsl">
+    <div class="fh-ii-icon" id="instIslIcon"></div>
+    <div class="fh-ii-info">
+      <div class="fh-ii-name" id="instIslName">App</div>
+      <div class="fh-pw"><div class="fh-pb" id="instIslBar" style="width:0%"></div></div>
+    </div>
+    <div class="fh-ii-pct" id="instIslPct">0%</div>
+  </div>
+
+  <div id="home">
+    <div class="fh-bar">
+      <div class="fh-brand">
+        <div class="fh-logo" aria-label="FireHub"></div>
+        <div class="fh-bname">Fire<span>Hub</span></div>
+        <a class="fh-gh-btn" id="ghBtn" aria-label="GitHub" title="DarkMorpheus on GitHub">
+          <i class="ti ti-brand-github"></i>
+        </a>
+      </div>
+      <div class="fh-br">
+        <button class="fh-ib" id="setB" data-i18n-aria="topbar.settings" aria-label="Settings"><i class="ti ti-settings"></i></button>
+        <button class="fh-lp" id="loginB"><i class="ti ti-user"></i><span data-i18n="topbar.signin">Sign in</span></button>
+        <div class="fh-uc" id="uc">
+          <div class="fh-uav" id="uav">A</div>
+          <span class="fh-un" id="un">User</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fh-srw">
+      <div class="fh-sr">
+        <i class="ti ti-search"></i>
+        <input id="searchInput" data-i18n-placeholder="search.placeholder" placeholder="Search apps, games or developers..." />
+        <i class="ti ti-x" id="searchClear" style="cursor:pointer;display:none;font-size:18px;color:var(--on-v);margin-right:4px;"></i>
+        <i class="ti ti-microphone" id="micBtn" style="cursor:pointer;"></i>
+      </div>
+    </div>
+
+    <div class="fh-sort-bar" id="sortBar" style="display:flex;align-items:center;justify-content:space-between;padding:6px 18px 2px;">
+      <span id="appCountLabel" style="font-size:12px;color:var(--on-v);font-weight:500;"></span>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--on-v);">
+        <i class="ti ti-sort-descending" style="font-size:16px;color:var(--p);"></i>
+        <span data-i18n="sort.by">Sort by</span>:
+        <select id="sortSelect" class="fh-sort-select" style="background:var(--c);color:var(--on);border:none;border-radius:var(--r-pill);padding:3px 10px;font-size:12px;outline:none;cursor:pointer;font-family:inherit;">
+          <option value="popular" data-i18n="sort.popular">Popularity</option>
+          <option value="rating" data-i18n="sort.rating">Rating</option>
+          <option value="name" data-i18n="sort.name">Name</option>
+          <option value="size" data-i18n="sort.size">Package Size</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fh-tabs">
+      <button class="fh-tab act" data-tab="all"><i class="ti ti-sparkles"></i><span data-i18n="tab.foryou">For you</span></button>
+      <button class="fh-tab" data-tab="top"><i class="ti ti-trending-up"></i><span data-i18n="tab.top">Top rated</span></button>
+      <button class="fh-tab" data-tab="games"><i class="ti ti-device-gamepad-2"></i><span data-i18n="tab.games">Games</span></button>
+      <button class="fh-tab" data-tab="productivity"><i class="ti ti-bulb"></i><span data-i18n="tab.productivity">Productivity</span></button>
+      <button class="fh-tab" data-tab="design"><i class="ti ti-palette"></i><span data-i18n="tab.design">Design</span></button>
+      <button class="fh-tab" data-tab="developer"><i class="ti ti-code"></i><span data-i18n="tab.developer">Developer</span></button>
+      <button class="fh-tab" data-tab="installed"><i class="ti ti-circle-check-filled"></i><span data-i18n="tab.installed">Installed Apps</span></button>
+    </div>
+
+    <div class="fh-sc">
+      <div class="fh-sec" style="padding-bottom:4px;">
+        <div class="fh-sech"><h2 data-i18n="section.editors">Editor's choice</h2><a class="fh-secl"><span data-i18n="section.all">All</span> <i class="ti ti-chevron-right"></i></a></div>
+      </div>
+      <div class="fh-hero">
+        <div class="fh-hc" data-app="firefox">
+          <div class="fh-hi" style="color:#E66000;"><i class="ti ti-brand-firefox"></i></div>
+          <div class="fh-hf"><div class="fh-hl" data-i18n="hero.opensource">Open Source</div><div class="fh-ht">Firefox</div><div class="fh-hs" data-i18n="badge.firefox.sub">Privacy-first browser</div></div>
+        </div>
+        <div class="fh-hc v2" data-app="blender">
+          <div class="fh-hi" style="color:#E87D0D;"><i class="ti ti-3d-cube-sphere"></i></div>
+          <div class="fh-hf"><div class="fh-hl" data-i18n="hero.forartists">For Artists</div><div class="fh-ht">Blender</div><div class="fh-hs" data-i18n="badge.blender.sub">Free 3D suite</div></div>
+        </div>
+        <div class="fh-hc" data-app="vscode">
+          <div class="fh-hi" style="color:#0078D4;"><i class="ti ti-code"></i></div>
+          <div class="fh-hf"><div class="fh-hl" data-i18n="hero.newversion">New Version</div><div class="fh-ht">VS Code</div><div class="fh-hs" data-i18n="badge.vscode.sub">Microsoft's code editor</div></div>
+        </div>
+        <div class="fh-hc v2" data-app="krita">
+          <div class="fh-hi" style="color:#A700FF;"><i class="ti ti-brush"></i></div>
+          <div class="fh-hf"><div class="fh-hl" data-i18n="hero.creativity">Creativity</div><div class="fh-ht">Krita</div><div class="fh-hs" data-i18n="badge.krita.sub">Digital painting studio</div></div>
+        </div>
+      </div>
+
+      <div class="fh-sec"><div class="fh-sech"><h2 data-i18n="section.categories">Categories</h2></div>
+        <div class="fh-cg">
+          <div class="fh-ct ico-coral"><i class="ti ti-device-gamepad-2"></i><span data-i18n="cat.games">Games</span></div>
+          <div class="fh-ct ico-blue"><i class="ti ti-code"></i><span data-i18n="cat.code">Code</span></div>
+          <div class="fh-ct ico-purple"><i class="ti ti-music"></i><span data-i18n="cat.music">Music</span></div>
+          <div class="fh-ct ico-teal"><i class="ti ti-message-circle"></i><span data-i18n="cat.chat">Chat</span></div>
+          <div class="fh-ct ico-amber"><i class="ti ti-palette"></i><span data-i18n="cat.design">Design</span></div>
+          <div class="fh-ct ico-green"><i class="ti ti-leaf"></i><span data-i18n="cat.health">Health</span></div>
+          <div class="fh-ct ico-rose"><i class="ti ti-camera"></i><span data-i18n="cat.photo">Photo</span></div>
+          <div class="fh-ct ico-indigo"><i class="ti ti-school"></i><span data-i18n="cat.education">Education</span></div>
+        </div>
+      </div>
+
+      <div class="fh-sec"><div class="fh-sech"><h2 data-i18n="section.popular">Popular apps</h2><a class="fh-secl"><span data-i18n="section.all">All</span> <i class="ti ti-chevron-right"></i></a></div></div>
+      <div class="fh-hs2" id="popularStrip"></div>
+
+      <div class="fh-sec"><div class="fh-sech"><h2 data-i18n="section.trending">Trending</h2><a class="fh-secl"><span data-i18n="section.all">All</span> <i class="ti ti-chevron-right"></i></a></div></div>
+      <div class="fh-al" id="trendingList"></div>
+    </div>
+  </div>
+
+  <div class="fh-d" id="detail">
+    <div class="fh-bar">
+      <button class="fh-ib" id="backB" aria-label="Back"><i class="ti ti-arrow-left"></i></button>
+      <div class="fh-br">
+        <button class="fh-ib" id="shareB" aria-label="Share"><i class="ti ti-share-2"></i></button>
+        <button class="fh-ib" id="moreB" aria-label="More"><i class="ti ti-dots-vertical"></i></button>
+      </div>
+    </div>
+    <div class="fh-sc">
+      <div class="fh-dh">
+        <div class="fh-dic" id="dIc"><i class="ti ti-app-window"></i></div>
+        <div class="fh-dm">
+          <div class="fh-dn" id="dN">App</div>
+          <div class="fh-dd" id="dDv">Dev</div>
+          <div class="fh-dc" id="dCt">Category</div>
+        </div>
+      </div>
+      <div class="fh-stat">
+        <div class="fh-st"><div class="fh-sv"><span id="dR">—</span><i class="ti ti-star-filled"></i></div><div class="fh-sl" id="dRn">No reviews</div></div>
+        <div class="fh-st"><div class="fh-sv" id="dDn">10M+</div><div class="fh-sl" data-i18n="detail.downloads">downloads</div></div>
+        <div class="fh-st"><div class="fh-sv" id="dSz">142 MB</div><div class="fh-sl" data-i18n="detail.size">package</div></div>
+        <div class="fh-st"><div class="fh-sv" id="dAg">3+</div><div class="fh-sl" data-i18n="detail.age">age</div></div>
+      </div>
+      <div class="fh-tr" id="dTr"></div>
+
+      <!-- Screenshot Gallery Section -->
+      <div class="fh-sec" id="dGalSec" style="padding:0 18px 16px;display:none;">
+        <h3 style="font-size:16px;margin-bottom:10px;" data-i18n="gallery.title">Screenshots & Previews</h3>
+        <div class="fh-gal-strip" id="dGalStrip"></div>
+      </div>
+
+      <div class="fh-iw" id="iw">
+        <button class="fh-ib2" id="instB"><i class="ti ti-download"></i><span data-i18n="install">Install</span></button>
+      </div>
+      <div class="fh-src" id="dSrc">
+        <div class="fh-sh2"><i class="ti ti-link"></i><span data-i18n="detail.source">Official source</span></div>
+        <div class="fh-su" id="dSu">https://...</div>
+        <div class="fh-sn" id="dSn">...</div>
+      </div>
+      <div class="fh-desc"><h3 data-i18n="detail.about">About this app</h3><p id="dDs">...</p></div>
+      <div class="fh-sec" style="padding:0 18px 8px;"><h3 style="font-size:16px;" data-i18n="detail.ratings">Ratings and reviews</h3></div>
+      <div class="fh-rv">
+        <div class="fh-rvh">
+          <div class="fh-rvr">
+            <div class="fh-rvb" id="rB">—</div>
+            <div class="fh-rvs" id="rS"></div>
+            <div class="fh-rvc" id="rC">0 votes</div>
+          </div>
+          <div class="fh-rbs" id="rBars"></div>
+        </div>
+        <div class="fh-rl" id="rL"></div>
+        <button class="fh-wr" id="wrB">
+          <i class="ti ti-pencil"></i>
+          <div class="fh-wri"><div class="fh-wrt" data-i18n="review.write">Write a review</div><div class="fh-wrs" id="wrS" data-i18n="review.signin">Sign in to write a review</div></div>
+          <i class="ti ti-chevron-right" style="color:var(--on-v);font-size:18px;"></i>
+        </button>
+        <div class="fh-rf" id="rF">
+          <div class="fh-rfs" id="rFS">
+            <i class="ti ti-star fh-rfst" data-s="1"></i><i class="ti ti-star fh-rfst" data-s="2"></i><i class="ti ti-star fh-rfst" data-s="3"></i><i class="ti ti-star fh-rfst" data-s="4"></i><i class="ti ti-star fh-rfst" data-s="5"></i>
+          </div>
+          <textarea class="fh-rft" id="rFT" data-i18n-placeholder="review.placeholder" placeholder="Write your thoughts..."></textarea>
+          <div class="fh-rfa"><button class="fh-bt" id="rFD" style="flex:0 0 auto;padding:10px 14px;display:none;color:#CF6679;"><i class="ti ti-trash"></i></button><button class="fh-bt" id="rFC" style="flex:0 0 auto;padding:10px 18px;" data-i18n="review.cancel">Cancel</button><button class="fh-bf" id="rFP" style="flex:0 0 auto;padding:10px 22px;" data-i18n="review.submit">Publish</button></div>
+        </div>
+      </div>
+      <div class="fh-sec" style="padding:0 18px 8px;"><h3 style="font-size:16px;" data-i18n="detail.tech">Technical info</h3></div>
+      <div class="fh-it2">
+        <div class="fh-ir"><span data-i18n="detail.version">Version</span><span id="dVr">1.0.0</span></div>
+        <div class="fh-ir"><span data-i18n="detail.updated">Updated</span><span data-i18n="detail.updated.value">3 days ago</span></div>
+        <div class="fh-ir"><span data-i18n="detail.license">License</span><span id="dLi">MIT</span></div>
+        <div class="fh-ir"><span data-i18n="detail.platforms">Platforms</span><span data-i18n="detail.platforms.value">Linux, Windows</span></div>
+        <div class="fh-ir"><span data-i18n="detail.arch">Architecture</span><span>x86_64, ARM64</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fh-mo" id="platM">
+    <div class="fh-mb">
+      <div class="fh-mh"></div>
+      <div class="fh-mt" data-i18n="plat.title">Choose your platform</div>
+      <div class="fh-ms" data-i18n="plat.subtitle">A build matching your OS will be installed.</div>
+      <div class="fh-pl">
+        <button class="fh-p2" data-plat="fedora"><div class="fh-pi ico-blue"><i class="ti ti-brand-redhat"></i></div><div class="fh-pif"><div class="fh-pn" data-i18n="plat.fedora">Fedora / RHEL user</div><span class="fh-pcm">.rpm · dnf install</span></div><div class="fh-pck"><i class="ti ti-check"></i></div></button>
+        <button class="fh-p2" data-plat="pisi"><div class="fh-pi ico-amber"><img class="fh-pisi-logo" src="icons/pisi-linux.png" alt="Pisi Linux" /></div><div class="fh-pif"><div class="fh-pn" data-i18n="plat.pisi">Pisi Linux user</div><span class="fh-pcm">.pisi · pisi it</span></div><div class="fh-pck"><i class="ti ti-check"></i></div></button>
+        <button class="fh-p2" data-plat="debian"><div class="fh-pi ico-rose"><i class="ti ti-brand-debian"></i></div><div class="fh-pif"><div class="fh-pn" data-i18n="plat.debian">Debian / Ubuntu user</div><span class="fh-pcm">.deb · apt install</span></div><div class="fh-pck"><i class="ti ti-check"></i></div></button>
+        <button class="fh-p2" data-plat="windows"><div class="fh-pi ico-cyan"><i class="ti ti-brand-windows"></i></div><div class="fh-pif"><div class="fh-pn" data-i18n="plat.windows">Windows user</div><span class="fh-pcm">.exe · MSI installer</span></div><div class="fh-pck"><i class="ti ti-check"></i></div></button>
+      </div>
+      <div class="fh-gh"><i class="ti ti-brand-github"></i> <b>FireHub</b> <span data-i18n="plat.gh">publishes 3 separate builds per release:</span> <code>.rpm</code> <code>.deb</code> <code>.exe</code></div>
+      <div class="fh-ma">
+        <button class="fh-bt" id="pC" data-i18n="plat.cancel">Cancel</button>
+        <button class="fh-bf" id="pOk" disabled><i class="ti ti-download"></i><span data-i18n="plat.start">Start installation</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="fh-mo cnt" id="logM">
+    <div class="fh-mb dlg">
+      <div class="fh-ll"></div>
+
+      <!-- Mod göstergesi: Giriş / Kayıt sekmeler -->
+      <div class="fh-auth-tabs">
+        <button class="fh-auth-tab act" id="tabSignin">
+          <i class="ti ti-login-2"></i>
+          <span data-i18n="login.submit">Sign in</span>
+        </button>
+        <button class="fh-auth-tab" id="tabSignup">
+          <i class="ti ti-user-plus"></i>
+          <span data-i18n="login.create">Sign up</span>
+        </button>
+      </div>
+
+      <!-- Başlık (moda göre değişir) -->
+      <div class="fh-mt" id="lTitle" data-i18n="login.title">Sign in to FireHub</div>
+      <div class="fh-ms" id="lSubtitle" data-i18n="login.subtitle">Sign in to write reviews and follow apps.</div>
+
+      <!-- Google butonu -->
+      <button class="fh-gb" id="lGoogle">
+        <span class="fh-gg"></span>
+        <span data-i18n="login.google">Continue with Google</span>
+      </button>
+      <div class="fh-dv" data-i18n="login.or">or</div>
+
+      <!-- Form alanları -->
+      <div class="fh-lf2">
+        <!-- Sadece kayıt modunda görünür -->
+        <input class="fh-in" type="text" placeholder="Display name" id="lDN"
+               style="display:none;" maxlength="40" autocomplete="name" />
+        <input class="fh-in" type="email" data-i18n-placeholder="login.email"
+               placeholder="Email" id="lE" autocomplete="email" />
+        <input class="fh-in" type="password" data-i18n-placeholder="login.pass"
+               placeholder="Password" id="lP" autocomplete="current-password" />
+        <!-- Sadece kayıt modunda: şifre doğrulama -->
+        <input class="fh-in" type="password" placeholder="Confirm password" id="lP2"
+               style="display:none;" autocomplete="new-password" />
+      </div>
+
+      <!-- Şifremi unuttum (sadece giriş modunda) -->
+      <a class="fh-forgot-link" id="lForgot" href="#">Şifremi unuttum?</a>
+
+      <!-- Email doğrulama uyarısı (kayıt sonrası) -->
+      <div class="fh-verify-notice" id="lVerify" style="display:none;">
+        <i class="ti ti-mail-check"></i>
+        <div>
+          <b id="lVerifyTitle">Email doğrulama gönderildi!</b>
+          <p id="lVerifyMsg">Gelen kutunu kontrol et ve bağlantıya tıkla.</p>
+          <button class="fh-resend-btn" id="lResend">Yeniden gönder</button>
+        </div>
+      </div>
+
+      <!-- Butonlar -->
+      <div class="fh-ma" id="lActions">
+        <button class="fh-bt" id="lC" data-i18n="login.cancel">Cancel</button>
+        <button class="fh-bf" id="lOk">
+          <i class="ti ti-login-2" id="lOkIcon"></i>
+          <span id="lOkText" data-i18n="login.submit">Sign in</span>
+        </button>
+      </div>
+
+      <div class="fh-lfo">
+        <i class="ti ti-flame" style="font-size:11px;color:var(--p);"></i>
+        <span data-i18n="login.foot">Secured by Firebase Authentication.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="fh-mo cnt" id="setM">
+    <div class="fh-mb big">
+      <div class="fh-mt" style="text-align:left;display:flex;align-items:center;gap:10px;">
+        <i class="ti ti-settings" style="font-size:24px;color:var(--p);"></i>
+        <span data-i18n="settings.title">Settings</span>
+      </div>
+
+      <!-- BlazeOS note inside settings -->
+      <div class="fh-blaze-note">
+        <i class="ti ti-flame"></i>
+        <span data-i18n="banner.blazeos">Optimized for BlazeOS — upgrade to BlazeOS for the best experience</span>
+      </div>
+
+      <div class="fh-set-group">
+        <div class="fh-set-gt" data-i18n="settings.account">Account</div>
+        <div id="profileBox"></div>
+      </div>
+
+      <div class="fh-set-group">
+        <div class="fh-set-gt" data-i18n="settings.appearance">Appearance</div>
+        <div class="fh-set-card" style="padding:4px 16px;">
+          <div style="padding:14px 0 4px;">
+            <div class="fh-set-n" style="margin-bottom:2px;" data-i18n="settings.theme">Theme color</div>
+            <div class="fh-set-s" data-i18n="settings.theme.sub">The entire app updates instantly</div>
+          </div>
+          <div class="fh-th-grid">
+            <div class="fh-th sel" data-theme="coral"><div class="fh-th-sw sw-coral"></div><div class="fh-th-n" data-i18n="theme.coral">Coral</div></div>
+            <div class="fh-th" data-theme="purple"><div class="fh-th-sw sw-purple"></div><div class="fh-th-n" data-i18n="theme.purple">Purple</div></div>
+            <div class="fh-th" data-theme="forest"><div class="fh-th-sw sw-forest"></div><div class="fh-th-n" data-i18n="theme.forest">Forest</div></div>
+            <div class="fh-th" data-theme="ocean"><div class="fh-th-sw sw-ocean"></div><div class="fh-th-n" data-i18n="theme.ocean">Ocean</div></div>
+            <div class="fh-th" data-theme="sunset"><div class="fh-th-sw sw-sunset"></div><div class="fh-th-n" data-i18n="theme.sunset">Sunset</div></div>
+            <div class="fh-th" data-theme="mint"><div class="fh-th-sw sw-mint"></div><div class="fh-th-n" data-i18n="theme.mint">Mint</div></div>
+            <div class="fh-th" data-theme="dark"><div class="fh-th-sw sw-dark"></div><div class="fh-th-n" data-i18n="theme.dark">Dark</div></div>
+          </div>
+          <div style="border-top:0.5px solid var(--out-v);margin-top:14px;"></div>
+          <div class="fh-set-row" style="padding:14px 0;border-bottom:none;" id="motionRow">
+            <div class="fh-set-ic"><i class="ti ti-bounce-right"></i></div>
+            <div class="fh-set-info">
+              <div class="fh-set-n" data-i18n="settings.animations">Animations</div>
+              <div class="fh-set-s" data-i18n="settings.animations.sub">Motion and transition effects</div>
+            </div>
+            <div class="fh-tog on" id="motionTog"></div>
+          </div>
+          <div class="fh-set-row" style="padding:14px 0;border-bottom:none;border-top:0.5px solid var(--out-v);" id="langRow">
+            <div class="fh-set-ic"><i class="ti ti-language"></i></div>
+            <div class="fh-set-info">
+              <div class="fh-set-n" data-i18n="settings.lang">Language</div>
+              <div class="fh-set-s" id="langCurrent">English</div>
+            </div>
+            <i class="ti ti-chevron-right fh-set-chev"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="fh-set-group">
+        <div class="fh-set-gt" data-i18n="settings.notifications">Notifications</div>
+        <div class="fh-set-card">
+          <div class="fh-set-row" id="updRow">
+            <div class="fh-set-ic"><i class="ti ti-refresh"></i></div>
+            <div class="fh-set-info">
+              <div class="fh-set-n" data-i18n="settings.notif.updates">App updates</div>
+              <div class="fh-set-s" data-i18n="settings.notif.updates.sub">Notify when new versions ready</div>
+            </div>
+            <div class="fh-tog on" id="updTog"></div>
+          </div>
+          <div class="fh-set-row" id="newsRow">
+            <div class="fh-set-ic"><i class="ti ti-news"></i></div>
+            <div class="fh-set-info">
+              <div class="fh-set-n" data-i18n="settings.notif.editor">Editor's picks</div>
+              <div class="fh-set-s" data-i18n="settings.notif.editor.sub">Weekly notifications</div>
+            </div>
+            <div class="fh-tog" id="newsTog"></div>
+          </div>
+          <div class="fh-set-row" id="repRow">
+            <div class="fh-set-ic"><i class="ti ti-message-circle"></i></div>
+            <div class="fh-set-info">
+              <div class="fh-set-n" data-i18n="settings.notif.replies">Reply notifications</div>
+              <div class="fh-set-s" data-i18n="settings.notif.replies.sub">When someone replies</div>
+            </div>
+            <div class="fh-tog on" id="repTog"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fh-set-group">
+        <div class="fh-set-gt" data-i18n="settings.about">About</div>
+        <div class="fh-set-card">
+          <div class="fh-set-row" id="aboutOpenRow">
+            <div class="fh-set-ic"><i class="ti ti-info-circle"></i></div>
+            <div class="fh-set-info">
+              <div class="fh-set-n" data-i18n="settings.about.version">Version info</div>
+              <div class="fh-set-s" data-i18n="settings.about.version.sub">FireHub 1.0.0 · Material 3 Expressive</div>
+            </div>
+            <i class="ti ti-chevron-right fh-set-chev"></i>
+          </div>
+          <div class="fh-set-row" id="ghRow">
+            <div class="fh-set-ic"><i class="ti ti-brand-github"></i></div>
+            <div class="fh-set-info">
+              <div class="fh-set-n" data-i18n="settings.about.github">GitHub repository</div>
+              <div class="fh-set-s" data-i18n="settings.about.github.sub">.rpm · .deb · .exe — 3 builds</div>
+            </div>
+            <i class="ti ti-external-link fh-set-chev"></i>
+          </div>
+          <div class="fh-set-row" id="chkUpdRow">
+            <div class="fh-set-ic"><i class="ti ti-cloud-download" id="chkUpdIcon"></i></div>
+            <div class="fh-set-info">
+              <div class="fh-set-n" data-i18n="settings.about.checkupdate">Check for updates</div>
+              <div class="fh-set-s" id="chkUpdSub" data-i18n="settings.about.checkupdate.sub">Check GitHub for a new version</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fh-ma" style="margin-top:6px;">
+        <button class="fh-bf" id="setClose" style="flex:1;" data-i18n="settings.close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detaylı Hakkında modalı -->
+  <div class="fh-mo cnt" id="aboutM">
+    <div class="fh-mb big">
+      <!-- Hero alanı -->
+      <div class="fh-about-hero">
+        <div class="fh-about-logo"></div>
+        <div class="fh-about-title-block">
+          <div class="fh-about-title" data-i18n="about.title">About FireHub</div>
+          <div class="fh-about-subtitle" data-i18n="about.subtitle">Material 3 Expressive app marketplace</div>
+          <div class="fh-about-version-pill">
+            <i class="ti ti-tag"></i><span data-i18n="about.version">Version 1.0.0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Author -->
+      <div class="fh-about-author">
+        <i class="ti ti-user-circle"></i>
+        <div>
+          <div class="fh-about-author-label" data-i18n="about.author">Created by</div>
+          <div class="fh-about-author-name" data-i18n="about.author.name">DarkMorpheus (Bulut Ars. E.)</div>
+        </div>
+      </div>
+
+      <!-- BlazeOS info -->
+      <div class="fh-about-blaze">
+        <div class="fh-about-blaze-icon"><i class="ti ti-flame"></i></div>
+        <div>
+          <div class="fh-about-blaze-title" data-i18n="about.blazeos.title">BlazeOS Optimization</div>
+          <div class="fh-about-blaze-sub" data-i18n="about.blazeos.sub">FireHub is developed for BlazeOS.</div>
+        </div>
+      </div>
+
+      <!-- Technology stack -->
+      <div class="fh-about-section-title" data-i18n="about.tech.title">Technology</div>
+      <div class="fh-set-card" style="margin-bottom:16px;">
+        <div class="fh-set-row" style="cursor:default;">
+          <div class="fh-set-ic"><i class="ti ti-app-window"></i></div>
+          <div class="fh-set-info">
+            <div class="fh-set-n" data-i18n="about.tech.electron">Electron 41</div>
+            <div class="fh-set-s" data-i18n="about.tech.electron.sub">Desktop framework</div>
+          </div>
+        </div>
+        <div class="fh-set-row" style="cursor:default;">
+          <div class="fh-set-ic"><i class="ti ti-flame"></i></div>
+          <div class="fh-set-info">
+            <div class="fh-set-n" data-i18n="about.tech.firebase">Firebase</div>
+            <div class="fh-set-s" data-i18n="about.tech.firebase.sub">Real-time reviews</div>
+          </div>
+        </div>
+        <div class="fh-set-row" style="cursor:default;">
+          <div class="fh-set-ic"><i class="ti ti-palette"></i></div>
+          <div class="fh-set-info">
+            <div class="fh-set-n" data-i18n="about.tech.material">Material 3 Expressive</div>
+            <div class="fh-set-s" data-i18n="about.tech.material.sub">Modern design language</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- License box -->
+      <div class="fh-about-section-title" data-i18n="about.license.title">⚖️ License</div>
+      <pre class="fh-about-license" id="aboutLicenseText"></pre>
+
+      <div class="fh-ma" style="margin-top:14px;">
+        <button class="fh-bf" id="aboutClose" style="flex:1;" data-i18n="about.close">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Language picker modal -->
+  <div class="fh-mo cnt" id="langM">
+    <div class="fh-mb dlg">
+      <div class="fh-mt" data-i18n="lang.title">Choose language</div>
+      <div class="fh-ms" data-i18n="lang.subtitle">Interface language will change instantly.</div>
+      <div class="fh-lang-list" id="langList"></div>
+      <div class="fh-ma" style="margin-top:14px;">
+        <button class="fh-bf" id="langClose" style="flex:1;" data-i18n="settings.close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hesap silme onay modali -->
+  <div class="fh-mo cnt" id="delAccM">
+    <div class="fh-mb dlg">
+      <div style="text-align:center;padding:8px 0 4px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(207,102,121,0.15);
+                    display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;">
+          <i class="ti ti-alert-triangle" style="font-size:32px;color:#CF6679;"></i>
+        </div>
+      </div>
+      <div class="fh-mt" style="color:#CF6679;">Hesabınızı silmek istediğinize emin misiniz?</div>
+      <div class="fh-ms">Bu işlem geri alınamaz. Yorumlarınız ve profiliniz kalıcı olarak silinir.</div>
+
+      <div class="fh-lf2" style="margin-top:14px;">
+        <input class="fh-in" type="password" id="delAccPass"
+               placeholder="Onaylamak için şifrenizi girin" autocomplete="current-password" />
+      </div>
+
+      <div style="font-size:11px;color:var(--on-v);margin-top:8px;line-height:1.5;">
+        ⚠️ Silinen veriler: profil, yorumlar, ayarlar. Yeniden kayıt olabilirsin ama eski verilerin gelmez.
+      </div>
+
+      <div class="fh-ma" style="margin-top:14px;">
+        <button class="fh-bt" id="delAccCancel">Vazgeç</button>
+        <button class="fh-bf" id="delAccOk"
+                style="background:#CF6679;color:#fff;">
+          <i class="ti ti-trash"></i><span>Hesabımı kalıcı olarak sil</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screenshot Lightbox Modal -->
+  <div class="fh-mo cnt" id="imgM">
+    <div class="fh-mb big" style="padding:16px;background:var(--c-lowest);text-align:center;position:relative;">
+      <button class="fh-icl" id="imgMClose" style="position:absolute;top:12px;right:12px;z-index:10;" aria-label="Close"><i class="ti ti-x"></i></button>
+      <img id="imgMSrc" src="" alt="Screenshot" style="max-width:100%;max-height:75vh;border-radius:var(--r-l);object-fit:contain;box-shadow:0 8px 30px rgba(0,0,0,0.3);" />
+    </div>
+  </div>
+</div>
+
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

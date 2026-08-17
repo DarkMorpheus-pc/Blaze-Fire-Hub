@@ -1,0 +1,64 @@
+# FireHub — BlazeOS icin DarkMorpheus (Bulut Ars. E.) tarafindan gelistirilmistir.
+# blazeos.com.tr - https://github.com/DarkMorpheus-pc
+# (c) Bulut Arslan Ergun — Bu program ozgur yazilimdir: GNU GPL v3.0 kosullari altinda yeniden dagitabilir ve/veya degistirebilirsiniz. Hicbir garanti verilmez; ayrintilar icin LICENSE dosyasina bakin.
+
+appId: com.blazeos.firehub
+productName: FireHub
+copyright: Copyright © DarkMorpheus (Bulut Ars. E.)
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - electron/**/*
+  - dist/**/*
+  - package.json
+
+extraResources:
+  - from: build/icon.png
+    to: icon.png
+
+linux:
+  executableName: firehub
+  target:
+    - target: deb
+      arch: [x64]
+    - target: rpm
+      arch: [x64]
+    # Pisi Linux .pisi paketi electron-builder tarafından üretilmiyor (Pisi
+    # kaynak-tabanlı bir paketleme sistemi — pspec.xml/actions.py gerektiriyor,
+    # bkz. pisi-package/). tar.gz burada yalnızca o paketin "kaynak arşivi"
+    # (Source/Archive) olarak kullanılacak, kurulabilir bir hedef değil.
+    - target: tar.gz
+      arch: [x64]
+  category: Utility
+  icon: build/icon.png
+  desktop:
+    entry:
+      Name: FireHub
+      StartupWMClass: FireHub
+      Comment: BlazeOS uygulama mağazası
+      Exec: /opt/FireHub/firehub %U
+      Terminal: false
+      Type: Application
+      Categories: Utility;System;
+
+deb:
+  depends:
+    - "pkexec | policykit-1"
+  compression: gz
+
+rpm:
+  depends:
+    - polkit
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+
+publish:
+  provider: github
+  owner: DarkMorpheus-pc
+  repo: Blaze-Fire-Hub

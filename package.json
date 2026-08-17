@@ -1,0 +1,35 @@
+{
+  "name": "firehub",
+  "version": "1.8.0",
+  "description": "BlazeOS işletim sistemine özel DarkMorpheus_Studio (Bulut Ars. E.) tarafından geliştirilen FireHub uygulama mağzası",
+  "main": "electron/main.js",
+  "author": {
+    "name": "DarkMorpheus (Bulut Ars. E.)",
+    "email": "Bfiremorpheus@protonmail.com"
+  },
+  "license": "GPL-3.0-only",
+  "homepage": "https://blazeos.com.tr/",
+  "private": true,
+  "productName": "FireHub",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "electron:dev": "electron .",
+    "dist": "vite build && electron-builder"
+  },
+  "dependencies": {
+    "firebase": "^12.13.0",
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8",
+    "vite": "^5.4.0"
+  },
+  "buildChannel": "alpha",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DarkMorpheus-pc/Blaze-Fire-Hub"
+  }
+}

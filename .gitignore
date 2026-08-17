@@ -1,0 +1,16 @@
+# bağımlılıklar / build çıktıları (yeniden üretilebilir, repoya girmemeli)
+node_modules/
+dist/
+release/
+
+# ortam değişkenleri / gizli değerler — ASLA commitleme
+.env
+.env.local
+.env.*.local
+
+# editör / araç config'leri
+.claude/
+
+# işletim sistemi
+.DS_Store
+Thumbs.db

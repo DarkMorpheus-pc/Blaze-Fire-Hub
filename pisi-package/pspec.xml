@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<!--
+  FireHub — BlazeOS icin DarkMorpheus (Bulut Ars. E.) tarafindan gelistirilmistir.
+  blazeos.com.tr - https://github.com/DarkMorpheus-pc
+  (c) Bulut Arslan Ergun — Bu program ozgur yazilimdir: GNU GPL v3.0 kosullari altinda yeniden dagitabilir ve/veya degistirebilirsiniz. Hicbir garanti verilmez; ayrintilar icin LICENSE dosyasina bakin.
+-->
+
+<!DOCTYPE PISI SYSTEM "http://www.pisilinux.org/projeler/pisi/pisi-spec.dtd">
+<PISI>
+    <Source>
+        <Name>firehub</Name>
+        <Homepage>https://blazeos.com.tr/</Homepage>
+        <Packager>
+            <Name>DarkMorpheus (Bulut Ars. E.)</Name>
+            <Email>Bfiremorpheus@protonmail.com</Email>
+        </Packager>
+        <License>LicenseRef-Proprietary</License>
+        <IsA>app:gui</IsA>
+        <Summary>BlazeOS uygulama mağazası</Summary>
+        <Description>FireHub, BlazeOS için geliştirilen, Material 3 Expressive tasarım diline sahip, 80+ uygulama kataloğu içeren masaüstü uygulama mağazasıdır.</Description>
+        <!--
+          ONEMLI: Bu arsiv, electron builder'in "tar.gz" hedefiyle uretilen
+          release paketidir (deb/rpm DEGIL) icinde onceden derlenmis, calismaya
+          hazir FireHub dosyalari var, burada hicbir sey derlenmiyor, sadece
+          yerlerine kopyalaniyor. Build/guncelleme adimlari icin bu klasordeki
+          README.md dosyasina bakin (URL, sha1sum ve versiyon her surumde
+          elle guncellenmeli).
+        -->
+        <Archive sha1sum="7669a122ebe238355689f9a6e2d2a842e5f8ac1a" type="targz">https://github.com/DarkMorpheus-pc/Blaze-Fire-Hub/releases/download/v1.8.0/firehub-1.8.0.tar.gz</Archive>
+        <!--
+          .desktop girisi ve ikon kaynak arsivinde degil, bu paketin kendi
+          files/ dizininde. AdditionalFiles, pisi build sirasinda bunlari
+          otomatik olarak kaynak calisma dizinine kopyalar (actions.py
+          calisirken CWD zaten bu dizinde olur) — pisilinux/chroot ile
+          gercekten test edilerek dogrulandi.
+        -->
+        <AdditionalFiles>
+            <AdditionalFile target="firehub.desktop" permission="0644">firehub.desktop</AdditionalFile>
+            <AdditionalFile target="firehub.png" permission="0644">firehub.png</AdditionalFile>
+        </AdditionalFiles>
+    </Source>
+
+    <Package>
+        <Name>firehub</Name>
+        <RuntimeDependencies>
+            <Dependency>polkit</Dependency>
+        </RuntimeDependencies>
+        <Files>
+            <Path fileType="executable">/opt/FireHub</Path>
+            <Path fileType="executable">/usr/bin/firehub</Path>
+            <Path fileType="data">/usr/share/applications/firehub.desktop</Path>
+            <Path fileType="data">/usr/share/icons/hicolor/512x512/apps/firehub.png</Path>
+        </Files>
+    </Package>
+
+    <History>
+        <Update release="1">
+            <Date>2026-08-15</Date>
+            <Version>1.8.0</Version>
+            <Comment>İlk Pisi Linux paketi.</Comment>
+            <Name>DarkMorpheus (Bulut Ars. E.)</Name>
+            <Email>Bfiremorpheus@protonmail.com</Email>
+        </Update>
+    </History>
+</PISI>
