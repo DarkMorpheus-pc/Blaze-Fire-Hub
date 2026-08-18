@@ -115,6 +115,10 @@ function mapAndSortReviews(docs) {
  * @returns {() => void} unsubscribe fonksiyonu
  */
 export function listenReviews(appId, callback, maxResults = 50) {
+  if (!db) {
+    callback([]);
+    return () => {};
+  }
   const q = query(collection(db, 'reviews', appId, 'items'), limit(maxResults));
   return onSnapshot(
     q,

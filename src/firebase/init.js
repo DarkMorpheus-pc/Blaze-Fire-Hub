@@ -6,6 +6,15 @@
 
 // FireHub — Firebase App / Auth / Firestore başlatma
 // Offline persistence açık.
+//
+// Not: .env dosyası olmadan (bkz. .env.example) VITE_FIREBASE_* değerleri
+// undefined gelir. Bu durumda Firebase SDK'sı initializeApp/getAuth/
+// initializeFirestore çağrılarında senkron hata fırlatır — bu dosya
+// modül yüklenirken (import zamanında) çalıştığı için, eskiden bu hata
+// tüm uygulamanın (menüler dahil) hiç açılmamasına yol açıyordu. Şimdi
+// hata yakalanıp firebaseReady=false ile devam ediliyor: tarama/kurulum
+// normal çalışır, sadece oturum açma/yorum/istatistik özellikleri kendi
+// noktalarında sessizce devre dışı kalır.
 
 import { initializeApp } from 'firebase/app';
 import { getAuth, browserLocalPersistence, setPersistence } from 'firebase/auth';
@@ -16,19 +25,37 @@ import {
 } from 'firebase/firestore';
 import { firebaseConfig } from './config.js';
 
-export const firebaseApp = initializeApp(firebaseConfig);
-export const auth = getAuth(firebaseApp);
+const REQUIRED_FIELDS = ['apiKey', 'authDomain', 'projectId', 'appId'];
+const hasCompleteConfig = REQUIRED_FIELDS.every((key) => !!firebaseConfig[key]);
 
-setPersistence(auth, browserLocalPersistence).catch((err) => {
-  console.warn('Auth persistence ayarlanamadı:', err);
-});
+export let firebaseApp = null;
+export let auth = null;
+export let db = null;
+export let firebaseReady = false;
 
-// Tek sekme yöneticisi: FireHub tek pencereli bir Electron uygulaması, aynı
-// origin'i açan birden fazla sekme/pencere senaryosu yok — çoklu-sekme
-// koordinasyon kilitlerinin (persistentMultipleTabManager) getirdiği ekstra
-// IndexedDB/iletişim yükü eski/düşük donanımlı sistemlerde gereksiz.
-export const db = initializeFirestore(firebaseApp, {
-  localCache: persistentLocalCache({
-    tabManager: persistentSingleTabManager(),
-  }),
-});
+if (hasCompleteConfig) {
+  try {
+    firebaseApp = initializeApp(firebaseConfig);
+    auth = getAuth(firebaseApp);
+    db = initializeFirestore(firebaseApp, {
+      localCache: persistentLocalCache({
+        tabManager: persistentSingleTabManager(),
+      }),
+    });
+    firebaseReady = true;
+
+    setPersistence(auth, browserLocalPersistence).catch((err) => {
+      console.warn('Auth persistence ayarlanamadı:', err);
+    });
+  } catch (err) {
+    console.error(
+      '[FireHub] Firebase başlatılamadı, oturum/yorum/istatistik özellikleri devre dışı:',
+      err,
+    );
+  }
+} else {
+  console.warn(
+    '[FireHub] Firebase yapılandırması eksik (.env dosyası yok/boş — bkz. .env.example). ' +
+      'Tarama ve kurulum normal çalışır; oturum açma, yorum ve istatistik özellikleri devre dışı.',
+  );
+}

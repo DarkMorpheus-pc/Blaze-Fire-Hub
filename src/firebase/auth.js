@@ -29,7 +29,15 @@ import {
   deleteDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { auth, db } from './init.js';
+import { auth, db, firebaseReady } from './init.js';
+
+function requireFirebase() {
+  if (!firebaseReady) {
+    throw new Error(
+      'Firebase yapılandırılmamış (.env eksik) — oturum açma şu an kullanılamıyor.',
+    );
+  }
+}
 
 /**
  * Kullanıcının banlanıp banlanmadığını kontrol eder.
@@ -51,6 +59,7 @@ async function checkBanned(uid) {
 
 /** E-posta + şifre ile kayıt olur. Firestore'da kullanıcı profili oluşturur. */
 export async function registerWithEmail(email, password, displayName) {
+  requireFirebase();
   const { user } = await createUserWithEmailAndPassword(auth, email, password);
   if (displayName) {
     await updateProfile(user, { displayName });
@@ -70,6 +79,7 @@ export async function registerWithEmail(email, password, displayName) {
 
 /** E-posta + şifre ile giriş yapar. */
 export async function signInWithEmail(email, password) {
+  requireFirebase();
   const cred = await signInWithEmailAndPassword(auth, email, password);
   await checkBanned(cred.user.uid);
   return cred.user;
@@ -77,6 +87,7 @@ export async function signInWithEmail(email, password) {
 
 /** Google popup ile giriş yapar; ilk girişse Firestore profili oluşturur. */
 export async function signInWithGoogle() {
+  requireFirebase();
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   const { user } = await signInWithPopup(auth, provider);
@@ -99,16 +110,24 @@ export async function signInWithGoogle() {
 
 /** Oturumu kapatır. */
 export function signOut() {
+  requireFirebase();
   return firebaseSignOut(auth);
 }
 
 /** Auth durum değişikliklerini dinler. Unsubscribe fonksiyonu döner. */
 export function onAuthChange(callback) {
+  if (!auth) {
+    // Firebase yapılandırılmamış — kayıtlı kullanıcı yok muamelesi yap,
+    // uygulamanın geri kalanı (tarama/kurulum) normal çalışmaya devam etsin.
+    callback(null);
+    return () => {};
+  }
   return firebaseOnAuthStateChanged(auth, callback);
 }
 
 /** Mevcut kullanıcıya e-posta doğrulama linki tekrar gönderir. */
 export async function resendVerificationEmail() {
+  requireFirebase();
   if (auth.currentUser && !auth.currentUser.emailVerified) {
     await sendEmailVerification(auth.currentUser);
     return true;
@@ -118,6 +137,7 @@ export async function resendVerificationEmail() {
 
 /** Şifre sıfırlama e-postası gönderir. */
 export async function sendPasswordReset(email) {
+  requireFirebase();
   if (!email || !email.includes('@')) {
     throw new Error('Gecerli bir e-posta adresi girin');
   }
@@ -131,6 +151,7 @@ export async function sendPasswordReset(email) {
  * ardından Firebase Auth kullanıcısını siler.
  */
 export async function deleteAccount(password) {
+  requireFirebase();
   const user = auth.currentUser;
   if (!user) throw new Error('Oturum acik degil');
 
