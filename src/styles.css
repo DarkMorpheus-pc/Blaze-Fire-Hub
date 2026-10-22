@@ -33,3 +33,73 @@
 /* Güncelleme kontrolü sırasında ikon döndürme (tabler-icons'ta hazır yok) */
 .ti-spin{display:inline-block;animation:sp .8s linear infinite}
 
+/* ==========================================================================
+   Blaze Continuum Design Language (BCDL: Kinetic Glass) Theme for FireHub
+   ========================================================================== */
+.fh.t-kinetic {
+  --p: #A9C7FF;
+  --op: #0D1524;
+  --pc: #20252B;
+  --opc: #E5E9F0;
+  --p-soft: #7CABF8;
+  --t: #85D79E;
+  --tc: #1B2C22;
+  --sf: #0D0F12;
+  --c-lowest: #090B0E;
+  --c-low: #121519;
+  --c: #161A20;
+  --c-h: #20252B;
+  --on: #E5E9F0;
+  --on-v: #9BA3AF;
+  --on-vv: #656C78;
+  --out: #3B4252;
+  --out-v: #242933;
+  --suc: #85D79E;
+  --suc-c: #1B2C22;
+  --warn: #E5BE6B;
+  --warn-c: #332612;
+  --info: #A9C7FF;
+  --info-c: #162238;
+  --p-hover: #C5DBFF;
+  --opn-c: #20252B;
+  --opn: #A9C7FF;
+}
+
+.sw-kinetic {
+  background: #20252b;
+}
+.sw-kinetic:before {
+  background: #a9c7ff;
+}
+.sw-kinetic:after {
+  background: #85d79e;
+}
+
+.fh.t-kinetic .fh-hc,
+.fh.t-kinetic .fh-set-card,
+.fh.t-kinetic .fh-prof,
+.fh.t-kinetic .fh-ac,
+.fh.t-kinetic .fh-li,
+.fh.t-kinetic .fh-ct,
+.fh.t-kinetic .fh-p2,
+.fh.t-kinetic .fh-mb,
+.fh.t-kinetic .fh-inst,
+.fh.t-kinetic .fh-src,
+.fh.t-kinetic .fh-about-author {
+  border-top: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.fh.t-kinetic .fh-bar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.fh.t-kinetic .fh-stat strong,
+.fh.t-kinetic .fh-rvb,
+.fh.t-kinetic .fh-ii-pct,
+.fh.t-kinetic .fh-pt b {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+

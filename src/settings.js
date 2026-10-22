@@ -15,7 +15,7 @@ import { renderPopularStrip, renderTrendingList, refreshBrowseView } from './bro
 import { refreshAppBadges } from './detail.js';
 import { APP_CATALOG } from './data/catalog.js';
 
-const THEMES = ['coral', 'purple', 'forest', 'ocean', 'sunset', 'mint', 'dark'];
+const THEMES = ['kinetic', 'coral', 'purple', 'forest', 'ocean', 'sunset', 'mint', 'dark'];
 const rootEl = () => el('fh');
 
 /** Temayı uygular, kök elemente sınıf ekler, seçim göstergesini günceller, localStorage'a kaydeder. */
