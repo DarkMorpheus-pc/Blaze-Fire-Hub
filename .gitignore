@@ -5,6 +5,7 @@ release/
 
 # ortam değişkenleri / gizli değerler — ASLA commitleme
 .env
+.env.encrypted
 .env.local
 .env.*.local
 
