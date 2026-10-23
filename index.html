@@ -226,6 +226,7 @@
       <div class="fh-ms" data-i18n="plat.subtitle">A build matching your OS will be installed.</div>
       <div class="fh-pl">
         <button class="fh-p2" data-plat="fedora"><div class="fh-pi ico-blue"><i class="ti ti-brand-redhat"></i></div><div class="fh-pif"><div class="fh-pn" data-i18n="plat.fedora">Fedora / RHEL user</div><span class="fh-pcm">.rpm · dnf install</span></div><div class="fh-pck"><i class="ti ti-check"></i></div></button>
+        <button class="fh-p2" data-plat="flatpak"><div class="fh-pi ico-purple"><i class="ti ti-box"></i></div><div class="fh-pif"><div class="fh-pn" data-i18n="plat.flatpak">Flatpak (Flathub)</div><span class="fh-pcm">flathub · flatpak install</span></div><div class="fh-pck"><i class="ti ti-check"></i></div></button>
         <button class="fh-p2" data-plat="pisi"><div class="fh-pi ico-amber"><img class="fh-pisi-logo" src="icons/pisi-linux.png" alt="Pisi Linux" /></div><div class="fh-pif"><div class="fh-pn" data-i18n="plat.pisi">Pisi Linux user</div><span class="fh-pcm">.pisi · pisi it</span></div><div class="fh-pck"><i class="ti ti-check"></i></div></button>
         <button class="fh-p2" data-plat="debian"><div class="fh-pi ico-rose"><i class="ti ti-brand-debian"></i></div><div class="fh-pif"><div class="fh-pn" data-i18n="plat.debian">Debian / Ubuntu user</div><span class="fh-pcm">.deb · apt install</span></div><div class="fh-pck"><i class="ti ti-check"></i></div></button>
         <button class="fh-p2" data-plat="windows"><div class="fh-pi ico-cyan"><i class="ti ti-brand-windows"></i></div><div class="fh-pif"><div class="fh-pn" data-i18n="plat.windows">Windows user</div><span class="fh-pcm">.exe · MSI installer</span></div><div class="fh-pck"><i class="ti ti-check"></i></div></button>
@@ -234,6 +235,57 @@
       <div class="fh-ma">
         <button class="fh-bt" id="pC" data-i18n="plat.cancel">Cancel</button>
         <button class="fh-bf" id="pOk" disabled><i class="ti ti-download"></i><span data-i18n="plat.start">Start installation</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BCDL Kinetic Glass — Yerel Paket Kurucu (Local Package Installer) Modalı -->
+  <div class="fh-mo cnt" id="pkgM">
+    <div class="fh-mb dlg fh-pkg-dialog">
+      <div class="fh-pkg-card">
+        <div class="fh-pkg-header">
+          <div class="fh-pkg-icon-wrap" id="pkgIconWrap">
+            <i class="ti ti-box fh-pkg-icon" id="pkgIcon"></i>
+          </div>
+          <div class="fh-pkg-title-area">
+            <div class="fh-pkg-type-badge" id="pkgBadge">.RPM PAKETİ</div>
+            <h2 class="fh-pkg-name" id="pkgName">Uygulama Adı</h2>
+            <div class="fh-pkg-ver" id="pkgVersion">v1.0.0</div>
+          </div>
+        </div>
+
+        <div class="fh-pkg-details">
+          <div class="fh-pkg-meta-row">
+            <span class="fh-pkg-meta-label">Dosya Boyutu</span>
+            <span class="fh-pkg-meta-val" id="pkgSize">0 MB</span>
+          </div>
+          <div class="fh-pkg-meta-row">
+            <span class="fh-pkg-meta-label">Paket Biçimi</span>
+            <span class="fh-pkg-meta-val" id="pkgType">RPM (Red Hat / Fedora)</span>
+          </div>
+          <div class="fh-pkg-meta-row fh-pkg-path-row">
+            <span class="fh-pkg-meta-label">Dosya Yolu</span>
+            <span class="fh-pkg-meta-val fh-pkg-path" id="pkgPath">/home/...</span>
+          </div>
+          <div class="fh-pkg-desc" id="pkgDesc" style="display:none;"></div>
+        </div>
+
+        <!-- İlerleme Alanı (Kurulum sırasında aktif) -->
+        <div class="fh-pkg-progress-box" id="pkgProgressBox" style="display:none;">
+          <div class="fh-pkg-progress-status" id="pkgProgressStatus">Kuruluyor...</div>
+          <div class="fh-pkg-bar-track">
+            <div class="fh-pkg-bar-fill" id="pkgBarFill"></div>
+          </div>
+        </div>
+
+        <!-- Butonlar -->
+        <div class="fh-ma fh-pkg-actions">
+          <button class="fh-bt" id="pkgCancelBtn">İptal</button>
+          <button class="fh-bf fh-pkg-install-btn" id="pkgInstallBtn">
+            <i class="ti ti-download"></i>
+            <span id="pkgInstallBtnText">Paketi Kur</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

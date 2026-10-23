@@ -869,6 +869,86 @@ const APP_CATALOG = {
       "pisi": { "type": "pkg", "value": "timeshift" },
       "debian": { "type": "pkg", "value": "timeshift" }
     }
+  },
+  "flatseal": {
+    "name": "Flatseal",
+    "detect": { "linux": "flatseal", "flatpakId": "com.github.tchx84.Flatseal" },
+    "install": {
+      "fedora": { "type": "flatpak", "value": "com.github.tchx84.Flatseal" },
+      "pisi": { "type": "flatpak", "value": "com.github.tchx84.Flatseal" },
+      "debian": { "type": "flatpak", "value": "com.github.tchx84.Flatseal" },
+      "flatpak": { "type": "flatpak", "value": "com.github.tchx84.Flatseal" }
+    }
+  },
+  "extensionmanager": {
+    "name": "Extension Manager",
+    "detect": { "linux": "extension-manager", "flatpakId": "com.mattjakeman.ExtensionManager" },
+    "install": {
+      "fedora": { "type": "flatpak", "value": "com.mattjakeman.ExtensionManager" },
+      "pisi": { "type": "flatpak", "value": "com.mattjakeman.ExtensionManager" },
+      "debian": { "type": "flatpak", "value": "com.mattjakeman.ExtensionManager" },
+      "flatpak": { "type": "flatpak", "value": "com.mattjakeman.ExtensionManager" }
+    }
+  },
+  "warehouse": {
+    "name": "Warehouse",
+    "detect": { "linux": "warehouse", "flatpakId": "io.github.flattool.Warehouse" },
+    "install": {
+      "fedora": { "type": "flatpak", "value": "io.github.flattool.Warehouse" },
+      "pisi": { "type": "flatpak", "value": "io.github.flattool.Warehouse" },
+      "debian": { "type": "flatpak", "value": "io.github.flattool.Warehouse" },
+      "flatpak": { "type": "flatpak", "value": "io.github.flattool.Warehouse" }
+    }
+  },
+  "qbittorrent": {
+    "name": "qBittorrent",
+    "detect": { "linux": "qbittorrent", "flatpakId": "org.qbittorrent.qBittorrent" },
+    "install": {
+      "fedora": { "type": "pkg", "value": "qbittorrent" },
+      "pisi": { "type": "pkg", "value": "qbittorrent" },
+      "debian": { "type": "pkg", "value": "qbittorrent" },
+      "flatpak": { "type": "flatpak", "value": "org.qbittorrent.qBittorrent" }
+    }
+  },
+  "filezilla": {
+    "name": "FileZilla",
+    "detect": { "linux": "filezilla", "flatpakId": "org.filezillaproject.Filezilla" },
+    "install": {
+      "fedora": { "type": "pkg", "value": "filezilla" },
+      "pisi": { "type": "pkg", "value": "filezilla" },
+      "debian": { "type": "pkg", "value": "filezilla" },
+      "flatpak": { "type": "flatpak", "value": "org.filezillaproject.Filezilla" }
+    }
+  },
+  "calibre": {
+    "name": "Calibre",
+    "detect": { "linux": "calibre", "flatpakId": "com.calibre_ebook.calibre" },
+    "install": {
+      "fedora": { "type": "pkg", "value": "calibre" },
+      "pisi": { "type": "pkg", "value": "calibre" },
+      "debian": { "type": "pkg", "value": "calibre" },
+      "flatpak": { "type": "flatpak", "value": "com.calibre_ebook.calibre" }
+    }
+  },
+  "peazip": {
+    "name": "PeaZip",
+    "detect": { "linux": "peazip", "flatpakId": "io.github.peazip.PeaZip" },
+    "install": {
+      "fedora": { "type": "flatpak", "value": "io.github.peazip.PeaZip" },
+      "pisi": { "type": "flatpak", "value": "io.github.peazip.PeaZip" },
+      "debian": { "type": "flatpak", "value": "io.github.peazip.PeaZip" },
+      "flatpak": { "type": "flatpak", "value": "io.github.peazip.PeaZip" }
+    }
+  },
+  "godot": {
+    "name": "Godot Engine",
+    "detect": { "linux": "godot", "flatpakId": "org.godotengine.Godot" },
+    "install": {
+      "fedora": { "type": "pkg", "value": "godot" },
+      "pisi": { "type": "pkg", "value": "godot" },
+      "debian": { "type": "pkg", "value": "godot3" },
+      "flatpak": { "type": "flatpak", "value": "org.godotengine.Godot" }
+    }
   }
 };
 

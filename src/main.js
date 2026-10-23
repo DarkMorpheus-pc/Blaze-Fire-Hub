@@ -18,12 +18,14 @@ import { initAuthModal } from './auth-modal.js';
 import { initSettings, renderProfileBox, checkForUpdatesOnStartup } from './settings.js';
 import { initReviewForm, prefillMyReview } from './review-form.js';
 import { initGlobalStats } from './stats.js';
+import { initLocalPackageInstaller } from './local-package-installer.js';
 
 function bootstrap() {
   applyTranslations();
 
   initBrowse();
   initPlatformModal();
+  initLocalPackageInstaller();
   initAuthModal();
   initSettings();
   initReviewForm();

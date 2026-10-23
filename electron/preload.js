@@ -44,5 +44,18 @@ contextBridge.exposeInMainWorld('firehub', {
   // Kurulu uygulamayı başlatır
   launchApp: (opts) => ipcRenderer.invoke('app:launchApp', opts),
   // Kurulu uygulamayı kaldırır
-  uninstallApp: (opts) => ipcRenderer.invoke('app:uninstallApp', opts)
+  uninstallApp: (opts) => ipcRenderer.invoke('app:uninstallApp', opts),
+
+  // ===== YEREL PAKET KURUCU (LOCAL PACKAGE INSTALLER) =====
+  onOpenLocalPackage: (callback) => {
+    const handler = (_event, pkgInfo) => callback(pkgInfo);
+    ipcRenderer.on('package:openLocal', handler);
+    return () => ipcRenderer.off('package:openLocal', handler);
+  },
+  onPackageProgress: (callback) => {
+    const handler = (_event, data) => callback(data);
+    ipcRenderer.on('package:installProgress', handler);
+    return () => ipcRenderer.off('package:installProgress', handler);
+  },
+  installLocalPackage: (opts) => ipcRenderer.invoke('package:installLocal', opts)
 });

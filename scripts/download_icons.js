@@ -121,7 +121,7 @@ async function main() {
     console.error(`Başarısız Olanlar:`, failedApps);
     process.exit(1);
   } else {
-    console.log(`[BAŞARILI] 82 uygulamanın tamamı için 128x128 resmi logolar yerel olarak hazırlandı!`);
+    console.log(`[BAŞARILI] ${totalApps} uygulamanın tamamı için 128x128 resmi logolar yerel olarak hazırlandı!`);
   }
 }
 

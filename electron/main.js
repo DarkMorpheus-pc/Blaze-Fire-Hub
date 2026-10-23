@@ -188,9 +188,140 @@ if (isDev && process.platform === 'linux') {
 // (Wayland/X11'de pencerenin doğru ikona bağlanması için kritik)
 app.setName('FireHub');
 
+// ======================================================================
+// YEREL PAKET İNCELEME & DEEP LINKING (.rpm, .deb, .flatpakref, .flatpak, .pisi)
+// ======================================================================
+function findPackageArg(argv) {
+  if (!Array.isArray(argv)) return null;
+  const packageExts = ['.rpm', '.deb', '.flatpakref', '.flatpak', '.pisi'];
+  for (const arg of argv) {
+    if (!arg || typeof arg !== 'string') continue;
+    if (arg.startsWith('--') || arg.startsWith('-')) continue;
+    const lower = arg.toLowerCase();
+    for (const ext of packageExts) {
+      if (lower.endsWith(ext)) {
+        const resolved = path.resolve(arg);
+        if (fs.existsSync(resolved)) {
+          return resolved;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function inspectPackageFile(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    const stats = fs.statSync(filePath);
+    const sizeBytes = stats.size;
+    const sizeMb = (sizeBytes / (1024 * 1024)).toFixed(1);
+    const ext = path.extname(filePath).toLowerCase();
+    const baseName = path.basename(filePath);
+
+    let pkgInfo = {
+      filePath,
+      fileName: baseName,
+      ext,
+      sizeBytes,
+      sizeFormatted: `${sizeMb} MB`,
+      name: baseName,
+      version: '',
+      description: '',
+      icon: null,
+      typeLabel: ''
+    };
+
+    if (ext === '.flatpakref') {
+      pkgInfo.typeLabel = 'Flatpak Ref (Flathub / Flatpak)';
+      const content = fs.readFileSync(filePath, 'utf8');
+      const lines = content.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('Name=')) pkgInfo.name = trimmed.slice(5).trim();
+        else if (trimmed.startsWith('Comment=')) pkgInfo.description = trimmed.slice(8).trim();
+        else if (trimmed.startsWith('Icon=')) pkgInfo.icon = trimmed.slice(5).trim();
+        else if (trimmed.startsWith('Branch=')) pkgInfo.version = trimmed.slice(7).trim();
+      }
+    } else if (ext === '.flatpak') {
+      pkgInfo.typeLabel = 'Flatpak Paketi (.flatpak)';
+      pkgInfo.name = baseName.replace(/\.flatpak$/i, '');
+    } else if (ext === '.rpm') {
+      pkgInfo.typeLabel = 'RPM Paketi (.rpm)';
+      try {
+        const rpmQuery = spawnSync('rpm', ['-qp', '--qf', '%{NAME}|%{VERSION}-%{RELEASE}|%{SUMMARY}', filePath], { encoding: 'utf8' });
+        if (rpmQuery.stdout && !rpmQuery.error) {
+          const matchingLine = rpmQuery.stdout.split('\n').map(l => l.trim()).find(l => l.includes('|'));
+          if (matchingLine) {
+            const parts = matchingLine.split('|');
+            if (parts[0]) pkgInfo.name = parts[0];
+            if (parts[1]) pkgInfo.version = parts[1];
+            if (parts[2]) pkgInfo.description = parts[2];
+          }
+        }
+      } catch {}
+      if (!pkgInfo.name || pkgInfo.name === baseName) {
+        const m = baseName.match(/^([a-zA-Z0-9_\-+]+?)-([\d][\w.\-+]+)\.(?:x86_64|noarch|i686|aarch64)\.rpm$/);
+        if (m) {
+          pkgInfo.name = m[1];
+          pkgInfo.version = m[2];
+        }
+      }
+    } else if (ext === '.deb') {
+      pkgInfo.typeLabel = 'Debian Paketi (.deb)';
+      try {
+        const dpkgQuery = spawnSync('dpkg-deb', ['-f', filePath, 'Package', 'Version', 'Description'], { encoding: 'utf8' });
+        if (dpkgQuery.stdout && !dpkgQuery.error) {
+          const lines = dpkgQuery.stdout.split('\n');
+          for (const l of lines) {
+            if (l.startsWith('Package:')) pkgInfo.name = l.slice(8).trim();
+            else if (l.startsWith('Version:')) pkgInfo.version = l.slice(8).trim();
+            else if (l.startsWith('Description:')) pkgInfo.description = l.slice(12).trim();
+          }
+        }
+      } catch {}
+      if (!pkgInfo.name || pkgInfo.name === baseName) {
+        const m = baseName.match(/^([a-zA-Z0-9_\-+]+?)_([\d][\w.\-+]+)_(?:amd64|all|arm64|i386)\.deb$/);
+        if (m) {
+          pkgInfo.name = m[1];
+          pkgInfo.version = m[2];
+        }
+      }
+    } else if (ext === '.pisi') {
+      pkgInfo.typeLabel = 'Pisi Linux Paketi (.pisi)';
+      pkgInfo.name = baseName.replace(/\.pisi$/i, '');
+    }
+
+    return pkgInfo;
+  } catch (err) {
+    console.error('inspectPackageFile error:', err);
+    return null;
+  }
+}
+
+let pendingPackageToOpen = findPackageArg(process.argv);
+
 // Tekil instance
 const gotLock = app.requestSingleInstanceLock();
-if (!gotLock) { app.quit(); process.exit(0); }
+if (!gotLock) {
+  app.quit();
+  process.exit(0);
+} else {
+  app.on('second-instance', (_event, commandLine) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+
+      const pkgPath = findPackageArg(commandLine);
+      if (pkgPath) {
+        const pkgInfo = inspectPackageFile(pkgPath);
+        if (pkgInfo) {
+          mainWindow.webContents.send('package:openLocal', pkgInfo);
+        }
+      }
+    }
+  });
+}
 
 let mainWindow = null;
 
@@ -233,6 +364,16 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
   }
 
+  mainWindow.webContents.once('did-finish-load', () => {
+    if (pendingPackageToOpen) {
+      const pkgInfo = inspectPackageFile(pendingPackageToOpen);
+      if (pkgInfo) {
+        mainWindow.webContents.send('package:openLocal', pkgInfo);
+      }
+      pendingPackageToOpen = null;
+    }
+  });
+
   mainWindow.once('ready-to-show', () => {
     if (mainWindow && !mainWindow.isDestroyed()) mainWindow.show();
     // electron-updater'ın sessiz indir+kur akışı yalnızca Windows NSIS için
@@ -250,11 +391,6 @@ function createWindow() {
   setTimeout(() => {
     if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isVisible()) {
       mainWindow.show();
-    }
-    if (isDev && process.argv.includes('--scroll-test')) {
-      mainWindow.webContents.executeJavaScript("document.querySelector('#home .fh-sc').scrollTop = 420;");
-    } else if (isDev && process.argv.includes('--detail-test')) {
-      mainWindow.webContents.executeJavaScript("document.querySelector('[data-app=\"firefox\"]').click();");
     }
   }, 1200);
 
@@ -710,7 +846,10 @@ ipcMain.handle('app:installApp', async (_event, opts) => {
     return { ok: false, error: 'Bilinmeyen uygulama: ' + appId };
   }
 
-  const config = app.install?.[platform];
+  let config = app.install?.[platform];
+  if (!config && platform === 'flatpak' && app.detect?.flatpakId) {
+    config = { type: 'flatpak', value: app.detect.flatpakId };
+  }
   if (!config) {
     return { ok: false, error: 'Bu platform icin kurulum yapilandirilmamis.' };
   }
@@ -1140,3 +1279,79 @@ ipcMain.handle('app:uninstallApp', async (_event, opts) => {
     });
   });
 });
+
+// ======================================================================
+// YEREL PAKET KURULUMU (pkexec dnf/apt/pisi veya flatpak install --user)
+// ======================================================================
+ipcMain.handle('package:installLocal', async (_event, { filePath }) => {
+  if (!filePath || typeof filePath !== 'string') {
+    return { ok: false, error: 'Geçersiz dosya yolu.' };
+  }
+  const resolved = path.resolve(filePath);
+  if (!fs.existsSync(resolved)) {
+    return { ok: false, error: 'Paket dosyası bulunamadı: ' + filePath };
+  }
+
+  const ext = path.extname(resolved).toLowerCase();
+  const validExts = ['.rpm', '.deb', '.flatpakref', '.flatpak', '.pisi'];
+  if (!validExts.includes(ext)) {
+    return { ok: false, error: 'Desteklenmeyen paket formatı: ' + ext };
+  }
+
+  return new Promise((resolve) => {
+    let cmd = '';
+    let args = [];
+
+    if (ext === '.flatpakref' || ext === '.flatpak') {
+      cmd = 'flatpak';
+      args = ['install', '--user', '-y', resolved];
+    } else if (ext === '.rpm') {
+      cmd = 'pkexec';
+      args = ['dnf', 'install', '-y', resolved];
+    } else if (ext === '.deb') {
+      cmd = 'pkexec';
+      args = ['apt-get', 'install', '-y', resolved];
+    } else if (ext === '.pisi') {
+      cmd = 'pkexec';
+      args = ['pisi', 'it', '-y', resolved];
+    }
+
+    const proc = spawn(cmd, args, {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, DEBIAN_FRONTEND: 'noninteractive' }
+    });
+
+    let stderr = '';
+    proc.stdout.on('data', (d) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('package:installProgress', { msg: d.toString() });
+      }
+    });
+    proc.stderr.on('data', (d) => {
+      stderr += d.toString();
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('package:installProgress', { msg: d.toString() });
+      }
+    });
+
+    proc.on('error', (err) => {
+      if (err.code === 'ENOENT') {
+        resolve({ ok: false, error: `${cmd} komutu sistemde bulunamadı.` });
+      } else {
+        resolve({ ok: false, error: err.message });
+      }
+    });
+
+    proc.on('close', (code) => {
+      if (code === 0) {
+        resolve({ ok: true });
+      } else if (code === 126 || code === 127) {
+        resolve({ ok: false, error: 'Kurulum yetkisi reddedildi veya iptal edildi.' });
+      } else {
+        const errMsg = stderr.trim().split('\n').slice(-3).join(' ') || `Kurulum başarısız (çıkış kodu ${code})`;
+        resolve({ ok: false, error: errMsg });
+      }
+    });
+  });
+});
+

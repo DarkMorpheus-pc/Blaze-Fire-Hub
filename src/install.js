@@ -15,12 +15,23 @@ import { refreshAppDetailButtons, openAppDetail } from './app-detail-controller.
 
 const PLATFORM_NAMES = {
   fedora: 'Fedora/RHEL',
+  flatpak: 'Flatpak (Flathub)',
   pisi: 'Pisi Linux',
   debian: 'Debian/Ubuntu',
   windows: 'Windows',
 };
 
-const PLATFORM_ORDER = ['fedora', 'pisi', 'debian', 'windows'];
+const PLATFORM_ORDER = ['fedora', 'flatpak', 'pisi', 'debian', 'windows'];
+
+/** Uygulama için platform yapılandırmasını çözer (Flatpak detect fallback dahil) */
+export function resolveInstallConfig(app, platform) {
+  if (!app) return null;
+  if (app.install?.[platform]) return app.install[platform];
+  if (platform === 'flatpak' && app.detect?.flatpakId) {
+    return { type: 'flatpak', value: app.detect.flatpakId };
+  }
+  return null;
+}
 
 /** Platform seçim modalını açar; uygulamanın desteklediği platformlara göre butonları günceller. */
 export function openPlatformModal() {
@@ -30,7 +41,7 @@ export function openPlatformModal() {
 
   document.querySelectorAll('.fh-p2').forEach((btn) => {
     const platform = btn.getAttribute('data-plat');
-    const config = app.install?.[platform];
+    const config = resolveInstallConfig(app, platform);
     const supported = config != null;
 
     btn.classList.remove('sel');
@@ -52,7 +63,7 @@ export function openPlatformModal() {
     }
   });
 
-  const supportedPlatforms = PLATFORM_ORDER.filter((p) => app.install?.[p] != null);
+  const supportedPlatforms = PLATFORM_ORDER.filter((p) => resolveInstallConfig(app, p) != null);
   if (supportedPlatforms.length === 0) {
     showToast('Platform yok', 'Bu uygulama hiçbir platformu desteklemiyor', undefined, true);
     return;
@@ -77,8 +88,8 @@ export function initPlatformModal() {
         const app = APP_CATALOG[state.currentAppId];
         const platform = btn.getAttribute('data-plat');
         const supportedNames = PLATFORM_ORDER
-          .filter((p) => app.install?.[p] != null)
-          .map((p) => ({ fedora: 'Fedora', pisi: 'Pisi Linux', debian: 'Debian/Ubuntu', windows: 'Windows' })[p])
+          .filter((p) => resolveInstallConfig(app, p) != null)
+          .map((p) => PLATFORM_NAMES[p])
           .filter(Boolean);
         const message = supportedNames.length
           ? `${app.name} yalnızca ${supportedNames.join(', ')} üzerinde çalışır`
@@ -112,7 +123,7 @@ async function startInstall() {
   const appId = state.currentAppId;
   const app = APP_CATALOG[appId];
   const platform = state.selectedPlatform;
-  const config = app.install?.[platform];
+  const config = resolveInstallConfig(app, platform);
 
   if (!config) {
     const platformLabel = PLATFORM_NAMES[platform] || platform;
