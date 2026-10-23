@@ -14,6 +14,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "download:icons": "node scripts/download_icons.js",
+    "prebuild": "node scripts/download_icons.js",
     "build": "vite build",
     "electron:dev": "electron .",
     "dist": "vite build && electron-builder"

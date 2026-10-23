@@ -202,7 +202,7 @@ function createWindow() {
     width: 1280, height: 820,
     minWidth: 960, minHeight: 640,
     show: false,
-    backgroundColor: '#FFF8F6',
+    backgroundColor: '#0D0F12',
     titleBarStyle: 'default',
     autoHideMenuBar: true,
     icon: isDev
@@ -211,14 +211,10 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      // OS sandbox prod'da acik: paketlenmis .deb/.rpm icin electron-builder
-      // chrome-sandbox yardimci binary'sine dogru suid-root izinlerini
-      // kurulum sirasinda ayarliyor. Dev'de (npm run electron:dev) kapali,
-      // cunku node_modules/electron/dist/chrome-sandbox suid'siz gelir ve
-      // gelistiricinin bunu manuel yapilandirmasini gerektirir.
       sandbox: !isDev,
       nodeIntegration: false,
-      webSecurity: true
+      webSecurity: true,
+      devTools: isDev
     }
   });
 
@@ -254,6 +250,11 @@ function createWindow() {
   setTimeout(() => {
     if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isVisible()) {
       mainWindow.show();
+    }
+    if (isDev && process.argv.includes('--scroll-test')) {
+      mainWindow.webContents.executeJavaScript("document.querySelector('#home .fh-sc').scrollTop = 420;");
+    } else if (isDev && process.argv.includes('--detail-test')) {
+      mainWindow.webContents.executeJavaScript("document.querySelector('[data-app=\"firefox\"]').click();");
     }
   }, 1200);
 

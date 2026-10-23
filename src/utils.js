@@ -84,3 +84,16 @@ export function showToast(title, subtitle, params, isError = false) {
     isError ? 7000 : 5000,
   );
 }
+
+/**
+ * Resmi 128x128 uygulama logosunu HTML olarak üretir.
+ * Dosya bulunamazsa pürüzsüzce glif fallback öğesine düşer.
+ * @param {object} app - APP_CATALOG uygulama objesi
+ * @param {string} [extraClass=''] - İkon için ek CSS sınıfları (fh-img-lg, fh-img-md vb.)
+ */
+export function renderAppIcon(app, extraClass = '') {
+  if (!app) return '';
+  const escapedName = escapeHtml(app.name || '');
+  return `<img class="fh-app-img ${extraClass}" src="./icons/${app.id}.png" alt="${escapedName}" loading="lazy" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" /><span class="fh-icon-fallback" style="display:none;">${app.ic}</span>`;
+}
+

@@ -28,12 +28,18 @@ function applyTheme(theme) {
   try { localStorage.setItem('firehub.theme', theme); } catch {}
 }
 
-/** Kayıtlı temayı (varsa) yükler. */
+/** Kayıtlı temayı (varsa) yükler, yoksa amiral gemisi 'kinetic' temasını uygular. */
 function restoreSavedTheme() {
   try {
     const saved = localStorage.getItem('firehub.theme');
-    if (saved && THEMES.includes(saved)) applyTheme(saved);
-  } catch {}
+    if (saved && THEMES.includes(saved)) {
+      applyTheme(saved);
+    } else {
+      applyTheme('kinetic');
+    }
+  } catch {
+    applyTheme('kinetic');
+  }
 }
 
 /** Ayarlar > Hesap bölümündeki profil kutusunu (giriş yapılmışsa profil, değilse CTA) render eder. */

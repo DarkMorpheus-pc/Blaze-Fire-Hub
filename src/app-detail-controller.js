@@ -9,7 +9,7 @@
 
 import { APP_CATALOG } from './data/catalog.js';
 import { t } from './i18n.js';
-import { el, escapeHtml, showToast } from './utils.js';
+import { el, escapeHtml, showToast, renderAppIcon } from './utils.js';
 import { state } from './state.js';
 import { renderRatingSummary, renderReviewList, refreshAppBadges } from './detail.js';
 import { listenReviews, computeRatingStats } from './firebase/reviews.js';
@@ -32,7 +32,7 @@ export function openAppDetail(appId) {
 
   state.currentAppId = appId;
 
-  el('dIc').innerHTML = app.ic;
+  el('dIc').innerHTML = renderAppIcon(app, 'fh-img-xl');
   el('dIc').className = `fh-dic ${app.co}`;
   el('dN').textContent = app.name;
   el('dDv').textContent = app.dev;

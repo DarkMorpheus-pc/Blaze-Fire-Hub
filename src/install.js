@@ -9,7 +9,7 @@
 
 import { APP_CATALOG } from './data/catalog.js';
 import { t } from './i18n.js';
-import { el, escapeHtml, showToast } from './utils.js';
+import { el, escapeHtml, showToast, renderAppIcon } from './utils.js';
 import { state } from './state.js';
 import { refreshAppDetailButtons, openAppDetail } from './app-detail-controller.js';
 
@@ -133,7 +133,7 @@ async function startInstall() {
   // Ayrıca iki farklı uygulamanın eşzamanlı kurulumu artık birbirini
   // ezmiyor (öncesinde tek global token bunu bozuyordu).
   state.activeInstalls[appId] = {
-    installId, appName: app.name, appIcon: app.ic, appColor: app.co,
+    installId, appName: app.name, appIcon: renderAppIcon(app, 'fh-img-md') || app.ic, appColor: app.co,
     type, ext, platform, stage: 'start', statusText: stageLabel + '...',
     percent: 0, received: 0, total: 0,
   };

@@ -8,7 +8,7 @@
 
 import { APP_CATALOG } from './data/catalog.js';
 import { t, getCurrentLang } from './i18n.js';
-import { el, escapeHtml, normalizeSearchText, showToast } from './utils.js';
+import { el, escapeHtml, normalizeSearchText, showToast, renderAppIcon } from './utils.js';
 import { state } from './state.js';
 import { refreshAppBadges } from './detail.js';
 import { openAppDetail, closeAppDetail } from './app-detail-controller.js';
@@ -178,7 +178,7 @@ export function renderPopularStrip() {
     const isInst = cachedInstalledIds.has(appId);
     return `
       <button class="fh-ac" data-app="${appId}">
-        <div class="fh-ai ${app.co}">${app.ic}</div>
+        <div class="fh-ai ${app.co}">${renderAppIcon(app, 'fh-img-lg')}</div>
         <div class="fh-an">${escapeHtml(app.name)}</div>
         <div class="fh-acat">${escapeHtml(app.cat)}</div>
         ${isInst ? `<div class="fh-badge-inst" style="margin-top:2px;"><i class="ti ti-check"></i> ${t('installed.badge')}</div>` : ''}
@@ -197,7 +197,7 @@ export function renderTrendingList() {
     return `
       <button class="fh-li" data-app="${appId}">
         <span class="fh-ln">${index + 1}</span>
-        <div class="fh-lic ${app.co}">${app.ic}</div>
+        <div class="fh-lic ${app.co}">${renderAppIcon(app, 'fh-img-md')}</div>
         <div class="fh-lf">
           <div class="fh-lnm">${escapeHtml(app.name)}</div>
           <div class="fh-lm">${escapeHtml(app.cat)} ${isInst ? `<span class="fh-badge-inst"><i class="ti ti-check"></i> ${t('installed.badge')}</span>` : ''}</div>
@@ -244,7 +244,7 @@ function renderFilteredList(entries, title, searchQuery) {
           const isInst = cachedInstalledIds.has(appId);
           return `
           <button class="fh-li" data-app="${appId}">
-            <div class="fh-lic ${app.co}">${app.ic}</div>
+            <div class="fh-lic ${app.co}">${renderAppIcon(app, 'fh-img-md')}</div>
             <div class="fh-lf">
               <div class="fh-lnm">${escapeHtml(app.name)}</div>
               <div class="fh-lm">

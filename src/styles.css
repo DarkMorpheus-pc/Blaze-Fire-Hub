@@ -63,6 +63,16 @@
   --p-hover: #C5DBFF;
   --opn-c: #20252B;
   --opn: #A9C7FF;
+
+  --r-s: 6px;
+  --r-m: 8px;
+  --r-l: 12px;
+  --r-xl: 14px;
+  --r-2xl: 16px;
+  --r-pill: 8px;
+  --spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --emph: cubic-bezier(0.16, 1, 0.3, 1);
+  --std: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .sw-kinetic {
@@ -75,6 +85,9 @@
   background: #85d79e;
 }
 
+/* ==========================================================================
+   BCDL Kinetic Glass: 1px Asymmetric Refraction Borders & Glass Backdrop
+   ========================================================================== */
 .fh.t-kinetic .fh-hc,
 .fh.t-kinetic .fh-set-card,
 .fh.t-kinetic .fh-prof,
@@ -93,13 +106,247 @@
 }
 
 .fh.t-kinetic .fh-bar {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(18, 21, 25, 0.88) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
+/* ==========================================================================
+   BCDL Official Application Icon System
+   ========================================================================== */
+.fh-app-img {
+  display: block;
+  object-fit: contain;
+  border-radius: 10px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.fh-li:hover .fh-app-img,
+.fh-ac:hover .fh-app-img {
+  transform: scale(1.06);
+}
+
+.fh-img-hero {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+}
+
+.fh-img-lg {
+  width: 80px;
+  height: 80px;
+  border-radius: 14px;
+}
+
+.fh-img-md {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.fh-img-xl {
+  width: 88px;
+  height: 88px;
+  border-radius: 16px;
+}
+
+/* Glass wrappers for icons */
+.fh.t-kinetic .fh-lic,
+.fh.t-kinetic .fh-ai,
+.fh.t-kinetic .fh-dic,
+.fh.t-kinetic .fh-hi {
+  background: rgba(22, 26, 32, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.fh.t-kinetic .fh-dic {
+  animation: none !important;
+  border-radius: 18px !important;
+  width: 96px;
+  height: 96px;
+}
+
+/* ==========================================================================
+   BCDL Precision Controls & Interactive Physics
+   ========================================================================== */
+.fh.t-kinetic .fh-ib {
+  border-radius: 8px !important;
+  background: rgba(22, 26, 32, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.fh.t-kinetic .fh-ib:hover {
+  background: #20252B !important;
+  border-color: rgba(169, 199, 255, 0.35) !important;
+  transform: translateY(-1px);
+}
+.fh.t-kinetic .fh-ib:active {
+  transform: scale(0.96) !important;
+}
+
+.fh.t-kinetic .fh-lp {
+  border-radius: 8px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.fh.t-kinetic .fh-sr {
+  border-radius: 10px !important;
+  background: #121519 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.fh.t-kinetic .fh-sr:focus-within {
+  border-color: #A9C7FF !important;
+  box-shadow: 0 0 0 2px rgba(169, 199, 255, 0.2) !important;
+}
+
+.fh.t-kinetic .fh-tab {
+  border-radius: 8px !important;
+  background: rgba(22, 26, 32, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.fh.t-kinetic .fh-tab:hover {
+  background: #20252B !important;
+}
+.fh.t-kinetic .fh-tab.act {
+  background: #20252B !important;
+  color: #A9C7FF !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.fh.t-kinetic .fh-hc {
+  background: linear-gradient(135deg, rgba(22, 26, 32, 0.95), rgba(15, 18, 22, 0.95)) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.fh.t-kinetic .fh-hc:hover {
+  transform: translateY(-2px);
+  border-color: rgba(169, 199, 255, 0.3) !important;
+}
+.fh.t-kinetic .fh-hc .fh-hi {
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.fh.t-kinetic .fh-ct {
+  border-radius: 10px !important;
+  background: #161A20 !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.fh.t-kinetic .fh-ct:hover {
+  transform: translateY(-2px);
+  background: #20252B !important;
+  border-color: rgba(169, 199, 255, 0.3) !important;
+}
+
+.fh.t-kinetic .fh-ac {
+  border-radius: 12px;
+  padding: 8px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fh.t-kinetic .fh-ac .fh-ai {
+  border-radius: 16px !important;
+  background: rgba(22, 26, 32, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.fh.t-kinetic .fh-li {
+  border-radius: 10px !important;
+  background: rgba(22, 26, 32, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  margin-bottom: 4px;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.fh.t-kinetic .fh-li:hover {
+  background: #20252B !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.fh.t-kinetic .fh-li .fh-lic {
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.fh.t-kinetic .fh-lb {
+  border-radius: 6px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.fh.t-kinetic .fh-ib2 {
+  border-radius: 8px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.fh.t-kinetic .fh-stat {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.fh.t-kinetic .fh-st {
+  border-right-color: rgba(255, 255, 255, 0.06);
+}
+.fh.t-kinetic .fh-tc {
+  border-radius: 6px !important;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.fh.t-kinetic .fh-mb {
+  border-radius: 14px !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  background: rgba(18, 21, 26, 0.94) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6) !important;
+}
+.fh.t-kinetic .fh-p2 {
+  border-radius: 10px !important;
+  background: #121519 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.fh.t-kinetic .fh-p2:hover {
+  border-color: rgba(169, 199, 255, 0.3) !important;
+  background: #161A20 !important;
+}
+.fh.t-kinetic .fh-p2.sel {
+  border-color: #A9C7FF !important;
+  background: #20252B !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.fh.t-kinetic .fh-bt,
+.fh.t-kinetic .fh-bf {
+  border-radius: 8px !important;
+}
+
+/* ==========================================================================
+   Swiss Tabular Numerals
+   ========================================================================== */
 .fh.t-kinetic .fh-stat strong,
 .fh.t-kinetic .fh-rvb,
 .fh.t-kinetic .fh-ii-pct,
-.fh.t-kinetic .fh-pt b {
+.fh.t-kinetic .fh-pt b,
+.fh.t-kinetic .fh-stat .fh-sv,
+.fh.t-kinetic .fh-ir span:last-child,
+.fh.t-kinetic .fh-lm,
+.fh.t-kinetic .fh-ln,
+.fh.t-kinetic .fh-pt,
+.fh.t-kinetic #appCountLabel {
   font-variant-numeric: tabular-nums lining-nums;
 }
 
