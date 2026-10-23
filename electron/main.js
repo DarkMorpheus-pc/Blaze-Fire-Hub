@@ -412,6 +412,10 @@ function createWindow() {
     }
   }, 1200);
 
+  mainWindow.webContents.on('console-message', (_event, _level, message) => {
+    console.log('[Renderer]', message);
+  });
+
   mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
     console.error('[FireHub] Page load failed:', errorCode, errorDescription, validatedURL);
   });
@@ -1090,7 +1094,6 @@ ipcMain.on('app:cancelInstall', (_event, id) => {
 // ======================================================================
 // APP DETECTION — Sistemi tarayarak kurulu uygulamaları bulur
 // ======================================================================
-const { spawnSync } = require('node:child_process');
 
 /**
  * Linux\'ta `which <binary>` ile binary PATH'te mi diye bakar.
