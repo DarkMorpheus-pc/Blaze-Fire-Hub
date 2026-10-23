@@ -57,5 +57,20 @@ contextBridge.exposeInMainWorld('firehub', {
     ipcRenderer.on('package:installProgress', handler);
     return () => ipcRenderer.off('package:installProgress', handler);
   },
-  installLocalPackage: (opts) => ipcRenderer.invoke('package:installLocal', opts)
+  installLocalPackage: (opts) => ipcRenderer.invoke('package:installLocal', opts),
+
+  // ===== GÜNCELLEME MERKEZİ (UPDATES HUB) =====
+  checkAppUpdates: () => ipcRenderer.invoke('app:checkAppUpdates'),
+  updateSingleApp: (opts) => ipcRenderer.invoke('app:updateSingleApp', opts),
+  updateAllApps: () => ipcRenderer.invoke('app:updateAllApps'),
+  onUpdateProgress: (callback) => {
+    const handler = (_event, data) => callback(data);
+    ipcRenderer.on('app:updateProgress', handler);
+    return () => ipcRenderer.off('app:updateProgress', handler);
+  },
+  onUpdateAllProgress: (callback) => {
+    const handler = (_event, data) => callback(data);
+    ipcRenderer.on('app:updateAllProgress', handler);
+    return () => ipcRenderer.off('app:updateAllProgress', handler);
+  }
 });

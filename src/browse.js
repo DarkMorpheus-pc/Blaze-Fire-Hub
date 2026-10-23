@@ -12,8 +12,9 @@ import { el, escapeHtml, normalizeSearchText, showToast, renderAppIcon } from '.
 import { state } from './state.js';
 import { refreshAppBadges } from './detail.js';
 import { openAppDetail, closeAppDetail } from './app-detail-controller.js';
+import { renderUpdatesView } from './updates-controller.js';
 
-const TAB_ORDER = ['all', 'top', 'games', 'productivity', 'design', 'developer', 'installed'];
+const TAB_ORDER = ['all', 'top', 'games', 'productivity', 'design', 'developer', 'installed', 'updates'];
 const CATEGORY_ORDER = ['games', 'code', 'music', 'chat', 'design', 'health', 'photo', 'education'];
 
 const TAB_LABEL_KEYS = {
@@ -24,6 +25,7 @@ const TAB_LABEL_KEYS = {
   design: 'tab.design',
   developer: 'tab.developer',
   installed: 'tab.installed',
+  updates: 'tab.updates',
 };
 
 const CATEGORY_LABEL_KEYS = {
@@ -280,6 +282,8 @@ export function refreshBrowseView() {
   } else if (state.activeTab === 'all') {
     if (countLabel) countLabel.textContent = `${totalAppsCount} ${t('count.apps', { n: '' }).trim()}`;
     showDefaultView();
+  } else if (state.activeTab === 'updates') {
+    renderUpdatesView();
   } else {
     const res = filterByTab(state.activeTab);
     if (countLabel) countLabel.textContent = `${res.length} ${t('count.apps', { n: '' }).trim()}`;
@@ -352,6 +356,9 @@ export function initBrowse() {
 
       if (tabId === 'installed') {
         await updateInstalledCache();
+      } else if (tabId === 'updates') {
+        renderUpdatesView();
+        return;
       }
       refreshBrowseView();
     });

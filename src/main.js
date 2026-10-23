@@ -19,6 +19,43 @@ import { initSettings, renderProfileBox, checkForUpdatesOnStartup } from './sett
 import { initReviewForm, prefillMyReview } from './review-form.js';
 import { initGlobalStats } from './stats.js';
 import { initLocalPackageInstaller } from './local-package-installer.js';
+import { initUpdatesController } from './updates-controller.js';
+
+function setupGlobalKeybindings() {
+  document.addEventListener('keydown', (e) => {
+    // Ctrl+K veya boştayken "/" tuşuna basıldığında aramaya odaklan
+    if (
+      (e.ctrlKey && (e.key === 'k' || e.key === 'K')) ||
+      (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA')
+    ) {
+      e.preventDefault();
+      const searchInput = el('searchInput') || document.querySelector('.fh-sr input');
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    } else if (e.key === 'Escape') {
+      // Modalları kapat veya aramayı temizle
+      const modals = ['pkgM', 'platM', 'setM', 'logM'];
+      let closedModal = false;
+      for (const mId of modals) {
+        const modal = el(mId);
+        if (modal && modal.classList.contains('act')) {
+          modal.classList.remove('act');
+          closedModal = true;
+          break;
+        }
+      }
+      if (!closedModal) {
+        const searchInput = el('searchInput') || document.querySelector('.fh-sr input');
+        if (searchInput && searchInput.value) {
+          searchInput.value = '';
+          searchInput.dispatchEvent(new Event('input'));
+        }
+      }
+    }
+  });
+}
 
 function bootstrap() {
   applyTranslations();
@@ -26,6 +63,8 @@ function bootstrap() {
   initBrowse();
   initPlatformModal();
   initLocalPackageInstaller();
+  initUpdatesController();
+  setupGlobalKeybindings();
   initAuthModal();
   initSettings();
   initReviewForm();

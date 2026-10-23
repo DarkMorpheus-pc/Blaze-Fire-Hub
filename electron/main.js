@@ -28,7 +28,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const https = require('node:https');
 const http = require('node:http');
-const { spawn } = require('node:child_process');
+const { spawn, spawnSync } = require('node:child_process');
 const { URL } = require('node:url');
 const { tmpdir } = require('node:os');
 const { APP_CATALOG } = require('./catalog.js');
@@ -356,6 +356,24 @@ function createWindow() {
     callback(false);
   });
   mainWindow.webContents.session.setPermissionCheckHandler(() => false);
+
+  // Guvenlik & Anti-Debugging: Uretim modunda DevTools kisayollarini ve menu teftisini engelle
+  if (!isDev) {
+    mainWindow.webContents.on('devtools-opened', () => {
+      mainWindow.webContents.closeDevTools();
+    });
+
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+      // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+      const isDevKey =
+        input.key === 'F12' ||
+        (input.control && input.shift && ['I', 'J', 'C', 'i', 'j', 'c'].includes(input.key)) ||
+        (input.control && ['U', 'u'].includes(input.key));
+      if (isDevKey) {
+        event.preventDefault();
+      }
+    });
+  }
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
@@ -1354,4 +1372,131 @@ ipcMain.handle('package:installLocal', async (_event, { filePath }) => {
     });
   });
 });
+
+// ======================================================================
+// GÜNCELLEME MERKEZİ (UPDATES HUB IPC)
+// ======================================================================
+ipcMain.handle('app:checkAppUpdates', async () => {
+  return new Promise((resolve) => {
+    let installedMap = new Map();
+    try {
+      const listProc = spawnSync('flatpak', ['list', '--app', '--columns=application,version,name'], {
+        encoding: 'utf8',
+        env: { ...process.env, LANG: 'C' }
+      });
+      if (listProc.stdout) {
+        for (const line of listProc.stdout.trim().split('\n')) {
+          if (!line.trim()) continue;
+          const [appId, ver, name] = line.split('\t');
+          if (appId) installedMap.set(appId.trim(), { version: (ver || '').trim(), name: (name || '').trim() });
+        }
+      }
+    } catch {}
+
+    let updates = [];
+    try {
+      const updatesProc = spawnSync('flatpak', ['remote-ls', '--updates', '--columns=application,version,name'], {
+        encoding: 'utf8',
+        env: { ...process.env, LANG: 'C' }
+      });
+      if (updatesProc.stdout) {
+        for (const line of updatesProc.stdout.trim().split('\n')) {
+          if (!line.trim()) continue;
+          const [flatpakId, newVersion, remoteName] = line.split('\t').map(s => (s || '').trim());
+          if (!flatpakId) continue;
+
+          const installed = installedMap.get(flatpakId);
+          const currentVersion = installed ? installed.version : '';
+
+          const catEntry = Object.entries(APP_CATALOG).find(([_k, v]) => v.detect && v.detect.flatpakId === flatpakId);
+          let targetAppId = flatpakId;
+          let displayName = remoteName || (installed ? installed.name : flatpakId);
+          let icon = null;
+          let isCatalogApp = false;
+
+          if (catEntry) {
+            targetAppId = catEntry[0];
+            displayName = catEntry[1].name;
+            icon = targetAppId;
+            isCatalogApp = true;
+          }
+
+          if (!updates.some(u => u.flatpakId === flatpakId)) {
+            updates.push({
+              appId: targetAppId,
+              flatpakId,
+              name: displayName,
+              currentVersion: currentVersion || 'Mevcut',
+              newVersion: newVersion || 'Yeni Sürüm',
+              icon,
+              isCatalogApp
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[Updates Hub] flatpak remote-ls hatası:', err);
+    }
+
+    resolve({ ok: true, updates, count: updates.length });
+  });
+});
+
+ipcMain.handle('app:updateSingleApp', async (_event, { flatpakId, appId }) => {
+  return new Promise((resolve) => {
+    if (!flatpakId) return resolve({ ok: false, error: 'Flatpak ID eksik' });
+    const proc = spawn('flatpak', ['update', '-y', flatpakId], {
+      env: { ...process.env, LANG: 'C' }
+    });
+
+    let stderr = '';
+    proc.stdout.on('data', (d) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('app:updateProgress', { appId, flatpakId, text: d.toString() });
+      }
+    });
+    proc.stderr.on('data', (d) => {
+      stderr += d.toString();
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('app:updateProgress', { appId, flatpakId, text: d.toString() });
+      }
+    });
+
+    proc.on('close', (code) => {
+      resolve({ ok: code === 0, code, error: code !== 0 ? stderr : null });
+    });
+    proc.on('error', (err) => {
+      resolve({ ok: false, error: err.message });
+    });
+  });
+});
+
+ipcMain.handle('app:updateAllApps', async () => {
+  return new Promise((resolve) => {
+    const proc = spawn('flatpak', ['update', '-y'], {
+      env: { ...process.env, LANG: 'C' }
+    });
+
+    let stderr = '';
+    proc.stdout.on('data', (d) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('app:updateAllProgress', { text: d.toString() });
+      }
+    });
+    proc.stderr.on('data', (d) => {
+      stderr += d.toString();
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('app:updateAllProgress', { text: d.toString() });
+      }
+    });
+
+    proc.on('close', (code) => {
+      resolve({ ok: code === 0, code, error: code !== 0 ? stderr : null });
+    });
+    proc.on('error', (err) => {
+      resolve({ ok: false, error: err.message });
+    });
+  });
+});
+
 
