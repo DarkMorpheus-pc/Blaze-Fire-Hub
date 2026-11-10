@@ -72,5 +72,9 @@ contextBridge.exposeInMainWorld('firehub', {
     const handler = (_event, data) => callback(data);
     ipcRenderer.on('app:updateAllProgress', handler);
     return () => ipcRenderer.off('app:updateAllProgress', handler);
-  }
+  },
+
+  // ===== CANLI FLATHUB ARAMA VE KURULUM =====
+  searchFlathub: (query) => ipcRenderer.invoke('flathub:search', { query }),
+  installFlathubById: (flatpakId) => ipcRenderer.invoke('flathub:installById', { flatpakId })
 });

@@ -14,6 +14,7 @@ import { state } from './state.js';
 import { refreshAppDetailButtons, openAppDetail } from './app-detail-controller.js';
 
 const PLATFORM_NAMES = {
+  blaze: 'BlazeOS Native (Portadora & Flathub)',
   fedora: 'Fedora/RHEL',
   flatpak: 'Flatpak (Flathub)',
   pisi: 'Pisi Linux',
@@ -21,12 +22,20 @@ const PLATFORM_NAMES = {
   windows: 'Windows',
 };
 
-const PLATFORM_ORDER = ['fedora', 'flatpak', 'pisi', 'debian', 'windows'];
+const PLATFORM_ORDER = ['blaze', 'flatpak', 'fedora', 'pisi', 'debian', 'windows'];
 
-/** Uygulama için platform yapılandırmasını çözer (Flatpak detect fallback dahil) */
+/** Uygulama için platform yapılandırmasını çözer (BlazeOS Native & Flatpak detect fallback dahil) */
 export function resolveInstallConfig(app, platform) {
   if (!app) return null;
   if (app.install?.[platform]) return app.install[platform];
+  if (platform === 'blaze') {
+    if (app.detect?.flatpakId) {
+      return { type: 'flatpak', value: app.detect.flatpakId };
+    }
+    if (app.detect?.linux) {
+      return { type: 'pkg', value: app.detect.linux };
+    }
+  }
   if (platform === 'flatpak' && app.detect?.flatpakId) {
     return { type: 'flatpak', value: app.detect.flatpakId };
   }
@@ -54,10 +63,10 @@ export function openPlatformModal() {
     if (!supported) {
       commandLabel.textContent = t('plat.unsupported');
     } else if (config.type === 'pkg') {
-      const cmd = platform === 'fedora' ? 'dnf install' : platform === 'pisi' ? 'pisi it' : 'apt install';
+      const cmd = platform === 'blaze' ? 'portadora install' : platform === 'fedora' ? 'dnf install' : platform === 'pisi' ? 'pisi it' : 'apt install';
       commandLabel.textContent = `${cmd} ${config.value}`;
     } else if (config.type === 'flatpak') {
-      commandLabel.textContent = `flatpak · ${config.value}`;
+      commandLabel.textContent = `flathub · ${config.value}`;
     } else if (config.type === 'url') {
       commandLabel.textContent = `${config.ext || '.pkg'} · direct download`;
     }
@@ -68,7 +77,11 @@ export function openPlatformModal() {
     showToast('Platform yok', 'Bu uygulama hiçbir platformu desteklemiyor', undefined, true);
     return;
   }
-  if (supportedPlatforms.length === 1) {
+  if (supportedPlatforms.includes('blaze')) {
+    document.querySelector('.fh-p2[data-plat="blaze"]')?.classList.add('sel');
+    state.selectedPlatform = 'blaze';
+    el('pOk').disabled = false;
+  } else if (supportedPlatforms.length === 1) {
     const only = supportedPlatforms[0];
     document.querySelector(`.fh-p2[data-plat="${only}"]`)?.classList.add('sel');
     state.selectedPlatform = only;

@@ -1,6 +1,6 @@
 {
   "name": "firehub",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "BlazeOS işletim sistemine özel DarkMorpheus_Studio (Bulut Ars. E.) tarafından geliştirilen FireHub uygulama mağzası",
   "main": "electron/main.js",
   "author": {

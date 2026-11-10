@@ -265,6 +265,79 @@ function renderFilteredList(entries, title, searchQuery) {
   if (scroll) scroll.scrollTop = 0;
 }
 
+/** Canlı Flathub arama sonuçlarını arama görünümünün altına ekler */
+async function appendLiveFlathubResults(query) {
+  if (!query || query.trim().length < 2) return;
+  if (typeof window.firehub?.searchFlathub !== 'function') return;
+
+  const filteredView = el('filteredView');
+  if (!filteredView) return;
+
+  const flathubSection = document.createElement('div');
+  flathubSection.id = 'flathubLiveSection';
+  flathubSection.innerHTML = `
+    <div class="fh-sec" style="margin-top:20px;">
+      <div class="fh-sech">
+        <h2><i class="ti ti-box"></i> Flathub Evrensel Katalog Sonuçları</h2>
+        <span style="font-size:12px;color:var(--on-v);" id="flathubStatusLbl">Aranıyor...</span>
+      </div>
+    </div>
+    <div class="fh-al" id="flathubHitsList"></div>
+  `;
+  filteredView.appendChild(flathubSection);
+
+  try {
+    const res = await window.firehub.searchFlathub(query);
+    if (state.searchQuery.trim() !== query.trim()) return;
+    const statusLbl = el('flathubStatusLbl');
+    const hitsList = el('flathubHitsList');
+    if (!hitsList) return;
+
+    if (!res || !res.ok || !Array.isArray(res.hits) || res.hits.length === 0) {
+      if (statusLbl) statusLbl.textContent = 'Sonuç yok';
+      return;
+    }
+
+    if (statusLbl) statusLbl.textContent = `${res.hits.length} Flathub paketi`;
+    hitsList.innerHTML = res.hits.map((hit) => `
+      <div class="fh-li" style="cursor:default;">
+        <div class="fh-lic ico-purple">
+          ${hit.icon ? `<img src="${escapeHtml(hit.icon)}" class="fh-img-md" alt="" />` : '<i class="ti ti-box"></i>'}
+        </div>
+        <div class="fh-lf">
+          <div class="fh-lnm">${escapeHtml(hit.name)}</div>
+          <div class="fh-lm">${escapeHtml(hit.developer)} · <code>${escapeHtml(hit.flatpakId)}</code> — ${escapeHtml(hit.summary)}</div>
+        </div>
+        <button class="fh-lb" data-flathub-install="${escapeHtml(hit.flatpakId)}" data-flathub-name="${escapeHtml(hit.name)}" style="border:none;cursor:pointer;">
+          Flathub'dan Kur
+        </button>
+      </div>
+    `).join('');
+
+    hitsList.querySelectorAll('[data-flathub-install]').forEach((btn) => {
+      btn.addEventListener('click', async (ev) => {
+        ev.stopPropagation();
+        const fpId = btn.getAttribute('data-flathub-install');
+        const fpName = btn.getAttribute('data-flathub-name') || fpId;
+        btn.disabled = true;
+        btn.textContent = 'Kuruluyor...';
+        showToast(`${fpName} Kuruluyor`, `flatpak install flathub ${fpId}`, undefined, false);
+        const instRes = await window.firehub.installFlathubById(fpId);
+        if (instRes && instRes.ok) {
+          btn.textContent = 'Kuruldu';
+          showToast(`${fpName} Kuruldu!`, 'Flathub üzerinden başarıyla yüklendi.', undefined, false);
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Tekrar Dene';
+          showToast('Flathub Kurulum Hatası', instRes?.error || 'Bilinmeyen hata', undefined, true);
+        }
+      });
+    });
+  } catch {
+    // Ignore network errors when offline
+  }
+}
+
 /** Aktif arama/sekme/kategori durumuna göre görünümü yeniden çizer. */
 export function refreshBrowseView() {
   const query = state.searchQuery.trim();
@@ -275,6 +348,7 @@ export function refreshBrowseView() {
     const res = searchApps(query);
     if (countLabel) countLabel.textContent = `${res.length} / ${totalAppsCount} ${t('count.apps', { n: '' }).trim()}`;
     renderFilteredList(res, `"${query}" - ${t('section.all')}`, query);
+    appendLiveFlathubResults(query);
   } else if (state.activeCategory) {
     const res = filterByCategory(state.activeCategory);
     if (countLabel) countLabel.textContent = `${res.length} ${t('count.apps', { n: '' }).trim()}`;

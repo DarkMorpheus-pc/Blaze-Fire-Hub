@@ -193,7 +193,7 @@ app.setName('FireHub');
 // ======================================================================
 function findPackageArg(argv) {
   if (!Array.isArray(argv)) return null;
-  const packageExts = ['.rpm', '.deb', '.flatpakref', '.flatpak', '.pisi'];
+  const packageExts = ['.blz', '.rpm', '.deb', '.flatpakref', '.flatpak', '.pisi'];
   for (const arg of argv) {
     if (!arg || typeof arg !== 'string') continue;
     if (arg.startsWith('--') || arg.startsWith('-')) continue;
@@ -290,6 +290,19 @@ function inspectPackageFile(filePath) {
     } else if (ext === '.pisi') {
       pkgInfo.typeLabel = 'Pisi Linux Paketi (.pisi)';
       pkgInfo.name = baseName.replace(/\.pisi$/i, '');
+    } else if (ext === '.blz') {
+      pkgInfo.typeLabel = 'BlazeOS Native Paketi (.blz · Portadora)';
+      pkgInfo.name = baseName.replace(/\.blz$/i, '');
+      try {
+        const blzQuery = spawnSync('portadora', ['info', filePath], { encoding: 'utf8' });
+        if (blzQuery.stdout && !blzQuery.error) {
+          for (const l of blzQuery.stdout.split('\n')) {
+            if (l.startsWith('Name:')) pkgInfo.name = l.slice(5).trim();
+            else if (l.startsWith('Version:')) pkgInfo.version = l.slice(8).trim();
+            else if (l.startsWith('Summary:')) pkgInfo.description = l.slice(8).trim();
+          }
+        }
+      } catch {}
     }
 
     return pkgInfo;
@@ -603,10 +616,11 @@ ipcMain.handle('app:getDistro', async () => {
     const idLike = fields.ID_LIKE || '';
     const combined = `${id} ${idLike}`;
 
+    if (/^(blaze|blazeos)$/.test(id) || /\bblaze(os)?\b/.test(idLike)) return 'blaze';
     if (/^pisilinux$/.test(id) || /\bpisilinux\b/.test(idLike)) return 'pisi';
     if (/^(fedora|rhel|centos)$/.test(id) || /\b(fedora|rhel)\b/.test(idLike)) return 'fedora';
     if (/^(debian|ubuntu|linuxmint)$/.test(id) || /\bdebian\b/.test(idLike)) return 'debian';
-    return 'unknown';
+    return 'blaze';
   } catch {
     return 'unknown';
   }
@@ -869,6 +883,13 @@ ipcMain.handle('app:installApp', async (_event, opts) => {
   }
 
   let config = app.install?.[platform];
+  if (!config && platform === 'blaze') {
+    if (app.detect?.flatpakId) {
+      config = { type: 'flatpak', value: app.detect.flatpakId };
+    } else if (app.detect?.linux) {
+      config = { type: 'pkg', value: app.detect.linux };
+    }
+  }
   if (!config && platform === 'flatpak' && app.detect?.flatpakId) {
     config = { type: 'flatpak', value: app.detect.flatpakId };
   }
@@ -889,17 +910,20 @@ ipcMain.handle('app:installApp', async (_event, opts) => {
 
   function isCanceled() { return activeInstalls.get(id)?.canceled === true; }
 
-  // ── PKG INSTALL (dnf / apt-get) ───────────────────────────────────
+  // ── PKG INSTALL (portadora / dnf / pisi / apt-get) ─────────────────
   async function installViaPkg() {
     if (process.platform !== 'linux') {
       return { ok: false, error: 'Paket yöneticisi yalnızca Linux\'ta çalışır.' };
     }
 
-    const cmd = 'pkexec';
-    const args = platform === 'fedora' ? ['dnf', 'install', '-y', value]
+    const canSudoNoPass = spawnSync('sudo', ['-n', 'true']).status === 0;
+    const cmd = (platform === 'blaze' && canSudoNoPass) ? 'sudo' : 'pkexec';
+    const args = platform === 'blaze'
+      ? (canSudoNoPass ? ['-n', 'portadora', 'install', value] : ['portadora', 'install', value])
+      : platform === 'fedora' ? ['dnf', 'install', '-y', value]
       : platform === 'pisi' ? ['pisi', 'it', '-y', value]
       : ['apt-get', 'install', '-y', value];
-    const pkgLabel = platform === 'fedora' ? 'dnf' : platform === 'pisi' ? 'pisi' : 'apt';
+    const pkgLabel = platform === 'blaze' ? 'portadora' : platform === 'fedora' ? 'dnf' : platform === 'pisi' ? 'pisi' : 'apt';
 
     sendProgress('pkg', { msg: `${pkgLabel} install ${value}...` });
 
@@ -1270,7 +1294,12 @@ ipcMain.handle('app:uninstallApp', async (_event, opts) => {
   }
 
   let args;
-  if (platform === 'fedora') {
+  const canSudoNoPass = spawnSync('sudo', ['-n', 'true']).status === 0;
+  let privCmd = 'pkexec';
+  if (platform === 'blaze') {
+    privCmd = canSudoNoPass ? 'sudo' : 'pkexec';
+    args = canSudoNoPass ? ['-n', 'portadora', 'remove', pkgName] : ['portadora', 'remove', pkgName];
+  } else if (platform === 'fedora') {
     args = ['dnf', 'remove', '-y', pkgName];
   } else if (platform === 'pisi') {
     args = ['pisi', 'rm', '-y', pkgName];
@@ -1279,7 +1308,7 @@ ipcMain.handle('app:uninstallApp', async (_event, opts) => {
   }
 
   return new Promise((resolve) => {
-    const proc = spawn('pkexec', args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    const proc = spawn(privCmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
     let stderr = '';
     proc.stderr.on('data', (d) => { stderr += d.toString(); });
     proc.on('error', (err) => {
@@ -1314,7 +1343,7 @@ ipcMain.handle('package:installLocal', async (_event, { filePath }) => {
   }
 
   const ext = path.extname(resolved).toLowerCase();
-  const validExts = ['.rpm', '.deb', '.flatpakref', '.flatpak', '.pisi'];
+  const validExts = ['.blz', '.rpm', '.deb', '.flatpakref', '.flatpak', '.pisi'];
   if (!validExts.includes(ext)) {
     return { ok: false, error: 'Desteklenmeyen paket formatı: ' + ext };
   }
@@ -1322,8 +1351,12 @@ ipcMain.handle('package:installLocal', async (_event, { filePath }) => {
   return new Promise((resolve) => {
     let cmd = '';
     let args = [];
+    const canSudoNoPass = spawnSync('sudo', ['-n', 'true']).status === 0;
 
-    if (ext === '.flatpakref' || ext === '.flatpak') {
+    if (ext === '.blz') {
+      cmd = canSudoNoPass ? 'sudo' : 'pkexec';
+      args = canSudoNoPass ? ['-n', 'portadora', 'install', resolved] : ['portadora', 'install', resolved];
+    } else if (ext === '.flatpakref' || ext === '.flatpak') {
       cmd = 'flatpak';
       args = ['install', '--user', '-y', resolved];
     } else if (ext === '.rpm') {
@@ -1501,5 +1534,96 @@ ipcMain.handle('app:updateAllApps', async () => {
     });
   });
 });
+
+// ======================================================================
+// CANLI FLATHUB ARAMA VE DOĞRUDAN FLATPAK KURULUMU (BLAZEOS FLATHUB BRIDGE)
+// ======================================================================
+ipcMain.handle('flathub:search', async (_event, { query }) => {
+  if (!query || typeof query !== 'string' || query.trim().length < 2) {
+    return { ok: true, hits: [] };
+  }
+  const q = query.trim().slice(0, 64);
+  return new Promise((resolve) => {
+    const payload = JSON.stringify({ query: q });
+    const req = https.request(
+      'https://flathub.org/api/v2/search',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
+          'User-Agent': 'FireHub-BlazeOS/1.9.0',
+          Accept: 'application/json'
+        }
+      },
+      (res) => {
+        let body = '';
+        res.on('data', (chunk) => { body += chunk; });
+        res.on('end', () => {
+          try {
+            if (res.statusCode !== 200) {
+              resolve({ ok: false, hits: [], error: `Flathub HTTP ${res.statusCode}` });
+              return;
+            }
+            const parsed = JSON.parse(body);
+            const rawHits = Array.isArray(parsed.hits) ? parsed.hits.slice(0, 18) : [];
+            const hits = rawHits.map((h) => ({
+              flatpakId: h.app_id || '',
+              name: h.name || h.app_id || '',
+              summary: h.summary || '',
+              developer: h.developer_name || 'Flathub',
+              icon: h.icon || null
+            })).filter((h) => /^[a-zA-Z0-9_.-]+\.[a-zA-Z0-9_.-]+$/.test(h.flatpakId));
+            resolve({ ok: true, hits });
+          } catch (e) {
+            resolve({ ok: false, hits: [], error: e.message });
+          }
+        });
+      }
+    );
+    req.on('error', (err) => resolve({ ok: false, hits: [], error: err.message }));
+    req.setTimeout(8000, () => {
+      req.destroy();
+      resolve({ ok: false, hits: [], error: 'Flathub zaman aşımı' });
+    });
+    req.write(payload);
+    req.end();
+  });
+});
+
+ipcMain.handle('flathub:installById', async (_event, { flatpakId }) => {
+  if (!flatpakId || typeof flatpakId !== 'string' || !/^[a-zA-Z0-9_.-]+\.[a-zA-Z0-9_.-]+$/.test(flatpakId)) {
+    return { ok: false, error: 'Geçersiz Flathub uygulama kimliği.' };
+  }
+  const checkFlatpak = spawnSync('flatpak', ['--version'], { encoding: 'utf8' });
+  if (checkFlatpak.error || checkFlatpak.status !== 0) {
+    return { ok: false, error: 'Flatpak sistemde kurulu değil.' };
+  }
+  await new Promise((resolve) => {
+    const addRemote = spawn('flatpak', [
+      'remote-add', '--user', '--if-not-exists', 'flathub',
+      'https://dl.flathub.org/repo/flathub.flatpakrepo',
+    ], { stdio: ['ignore', 'pipe', 'pipe'] });
+    addRemote.on('error', () => resolve());
+    addRemote.on('close', () => resolve());
+  });
+
+  return new Promise((resolve) => {
+    const proc = spawn('flatpak', ['install', '--user', '-y', 'flathub', flatpakId], {
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    let stderr = '';
+    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+    proc.on('error', (err) => resolve({ ok: false, error: err.message }));
+    proc.on('close', (code) => {
+      if (code === 0) {
+        resolve({ ok: true, flatpakId });
+      } else {
+        resolve({ ok: false, error: stderr.trim().split('\n').slice(-2).join(' ') || `Flatpak hata kodu ${code}` });
+      }
+    });
+  });
+});
+
 
 

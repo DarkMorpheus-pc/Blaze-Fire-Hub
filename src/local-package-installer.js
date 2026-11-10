@@ -88,7 +88,10 @@ export function openPackageModal(pkgInfo) {
   // Paket badge stili
   const ext = (pkgInfo.ext || '').toLowerCase();
   badgeEl.className = 'fh-pkg-type-badge';
-  if (ext === '.rpm') {
+  if (ext === '.blz') {
+    badgeEl.textContent = 'BLAZEOS (.BLZ)';
+    badgeEl.classList.add('fh-pkg-badge-pisi');
+  } else if (ext === '.rpm') {
     badgeEl.textContent = 'RPM PAKETİ';
     badgeEl.classList.add('fh-pkg-badge-rpm');
   } else if (ext === '.deb') {
