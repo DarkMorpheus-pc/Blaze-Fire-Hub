@@ -189,6 +189,35 @@ if (isDev && process.platform === 'linux') {
 app.setName('FireHub');
 
 // ======================================================================
+// GÜVENLİK SERTLEŞTİRME (üretim): hata ayıklayıcı/enjeksiyon yüzeyini kapat
+// ======================================================================
+// Paketlenmiş sürümde uzaktan hata ayıklama (--inspect, --remote-debugging-*)
+// ile bellekteki yapılandırmaya/anahtarlara erişim denemelerini reddet.
+if (!isDev) {
+  const hostile = process.argv.find((a) =>
+    typeof a === 'string' &&
+    /^--(inspect|inspect-brk|inspect-port|remote-debugging-port|remote-debugging-pipe|js-flags)\b/.test(a)
+  );
+  if (hostile) {
+    console.error('[FireHub Shield] Hata ayıklama bayrağı üretim sürümünde yasak.');
+    app.exit(1);
+  }
+  delete process.env.NODE_OPTIONS;
+  delete process.env.ELECTRON_RUN_AS_NODE;
+}
+
+app.on('web-contents-created', (_event, contents) => {
+  // <webview> gömmeyi tamamen yasakla
+  contents.on('will-attach-webview', (e) => e.preventDefault());
+  // Kamera/mikrofon/konum/bildirim vb. tüm izin isteklerini reddet
+  contents.session.setPermissionRequestHandler((_wc, _permission, callback) => callback(false));
+  // DevTools'u üretimde zorla kapat
+  if (!isDev) {
+    contents.on('devtools-opened', () => contents.closeDevTools());
+  }
+});
+
+// ======================================================================
 // YEREL PAKET İNCELEME & DEEP LINKING (.rpm, .deb, .flatpakref, .flatpak, .pisi)
 // ======================================================================
 function findPackageArg(argv) {

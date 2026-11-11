@@ -14,6 +14,25 @@ files:
   - electron/**/*
   - dist/**/*
   - package.json
+  # SECURITY: never ship secrets, sourcemaps, build scripts or tests inside the package
+  - "!**/*.map"
+  - "!**/.env*"
+  - "!**/*.pem"
+  - "!**/*.key"
+  - "!scripts/**"
+  - "!src/**"
+  - "!**/*.md"
+
+# SECURITY: pack app code into app.asar and make the binary refuse to run unpacked/tampered code
+asar: true
+electronFuses:
+  runAsNode: false
+  enableCookieEncryption: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false
 
 extraResources:
   - from: build/icon.png

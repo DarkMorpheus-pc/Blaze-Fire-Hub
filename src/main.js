@@ -82,6 +82,14 @@ function bootstrap() {
   const scheduleIdle = window.requestIdleCallback || ((fn) => setTimeout(fn, 0));
   scheduleIdle(() => initGlobalStats());
 
+  // BlazeOS üzerinde çalışırken "BlazeOS'a geç" reklam bandı anlamsız — gizle.
+  window.firehub?.getDistro?.().then((distro) => {
+    if (distro === 'blaze') {
+      document.getElementById('blazeBanner')?.remove();
+      document.querySelectorAll('.fh-blaze-note').forEach((n) => n.remove());
+    }
+  }).catch(() => {});
+
   // FireHub'ın kendisi için GitHub Releases'i sessizce bir kere kontrol eder
   // ("App updates" bildirimleri kapalıysa hiç ağ isteği yapılmaz, bkz. settings.js).
   scheduleIdle(() => checkForUpdatesOnStartup());

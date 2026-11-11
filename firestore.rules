@@ -1,0 +1,153 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model (inferred from src/firebase/{auth,reviews}.js)
+// ===============================================================
+//
+// Collection: reviews/{appId}/items/{uid}
+//   Document ID: the author's uid (=> one review per user per app)
+//   Fields (all required, no others allowed):
+//     - uid: string, == doc id == request.auth.uid (immutable)
+//     - displayName: string, 1..100 chars
+//     - rating: int, 1..5
+//     - text: string, 10..1000 chars
+//     - createdAt: timestamp, == request.time on create, immutable
+//   Public read (catalog shows ratings without login). Contains no email.
+//
+// Collection: users/{uid}   (contains PII: email -> owner-only read)
+//   Fields (all required, no others allowed):
+//     - uid: string (== doc id, immutable)
+//     - displayName: string, 1..100 chars
+//     - email: string (== verified auth token email, <= 320 chars)
+//     - createdAt: timestamp == request.time (immutable)
+//     - reviewCount: int, must be 0 on create (client cannot change it)
+//     - flagCount: int, must be 0 on create (client cannot change it)
+//     - provider: 'email' | 'google'
+//   Clients never update this doc (app only creates / reads / deletes it).
+//
+// Collection: banned/{uid}
+//   Fields: reason (string) - written only by admins via Admin SDK
+//   A user may read ONLY their own doc (app checks it at sign-in).
+//
+// There is no client-side "global stats" collection; rating aggregates
+// are computed client-side from reviews. Any other path is denied.
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------------------------------------------------------
+    // Helper Functions
+    // ---------------------------------------------------------
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isNotBanned() {
+      return !exists(/databases/$(database)/documents/banned/$(request.auth.uid));
+    }
+
+    function isVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    function validStr(v, minLen, maxLen) {
+      return v is string && v.size() >= minLen && v.size() <= maxLen;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // ---------------------------------------------------------
+    // Domain validators (used on BOTH create and update)
+    // ---------------------------------------------------------
+    function isValidReview(userId) {
+      let d = request.resource.data;
+      return hasRequiredFields(['uid', 'displayName', 'rating', 'text', 'createdAt']) &&
+             hasOnlyAllowedFields(['uid', 'displayName', 'rating', 'text', 'createdAt']) &&
+             d.uid == userId &&
+             d.uid == request.auth.uid &&
+             validStr(d.displayName, 1, 100) &&
+             d.rating is int && d.rating >= 1 && d.rating <= 5 &&
+             validStr(d.text, 10, 1000) &&
+             d.createdAt is timestamp;
+    }
+
+    function isValidUser(userId) {
+      let d = request.resource.data;
+      return hasRequiredFields(['uid', 'displayName', 'email', 'createdAt',
+                                'reviewCount', 'flagCount', 'provider']) &&
+             hasOnlyAllowedFields(['uid', 'displayName', 'email', 'createdAt',
+                                   'reviewCount', 'flagCount', 'provider']) &&
+             d.uid == userId &&
+             validStr(d.displayName, 1, 100) &&
+             validStr(d.email, 3, 320) &&
+             d.email == request.auth.token.email &&
+             d.createdAt is timestamp &&
+             d.reviewCount is int && d.flagCount is int &&
+             d.provider in ['email', 'google'];
+    }
+
+    // ---------------------------------------------------------
+    // Reviews
+    // ---------------------------------------------------------
+    match /reviews/{appId}/items/{userId} {
+      // Public catalog data (no PII stored). Bounded by client limit().
+      allow read: if true;
+
+      // One review per user per app is enforced by doc id == uid.
+      allow create: if isOwner(userId) && isVerified() && isNotBanned() &&
+                       appId.size() <= 200 &&
+                       isValidReview(userId) &&
+                       request.resource.data.createdAt == request.time;
+
+      // Owner may edit rating/text/displayName; createdAt and uid immutable.
+      allow update: if isOwner(userId) && isVerified() && isNotBanned() &&
+                       isValidReview(userId) &&
+                       request.resource.data.createdAt == resource.data.createdAt &&
+                       request.resource.data.uid == resource.data.uid;
+
+      allow delete: if isOwner(userId);
+    }
+
+    // ---------------------------------------------------------
+    // User profiles (PII: owner-only)
+    // ---------------------------------------------------------
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+
+      allow create: if isOwner(userId) && isValidUser(userId) &&
+                       request.resource.data.createdAt == request.time &&
+                       request.resource.data.reviewCount == 0 &&
+                       request.resource.data.flagCount == 0;
+
+      // No client updates: counters/flags are server-managed.
+      allow update: if false;
+
+      // Account deletion (KVKK/GDPR) by the owner.
+      allow delete: if isOwner(userId);
+    }
+
+    // ---------------------------------------------------------
+    // Ban list: users may only check their own entry; admin-SDK writes.
+    // ---------------------------------------------------------
+    match /banned/{userId} {
+      allow get: if isOwner(userId);
+      allow list, write: if false;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
